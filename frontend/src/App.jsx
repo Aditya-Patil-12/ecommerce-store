@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import ProductList from './features/productList/ProductList'
+function App() {
+  const [count, setCount] = useState(0)
 
-const App = () => {
-  const [data, setData] = useState();
+  return (
+    <>
+    <ProductList />
+    </>
+  )
+}
 
-  const getData = async () => {
-    console.log("Fetching data...");
-    const resp = await axios.get("http://localhost:5000/api/v1");
-    console.log(resp.data.done);
-    
-    setData(resp.data.done);
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  return <div>{data ? `Data: ${data}` : "Loading..."}</div>; 
-};
-
-export default App;
+export default App
