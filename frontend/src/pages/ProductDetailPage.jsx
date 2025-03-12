@@ -4,9 +4,7 @@ import ProductDetails from "../features/productList/productComponent/ProductDeta
 const  ProductDetailPage = () => {
   return (
     <div>
-      <Navbar>
         <ProductDetails />
-      </Navbar>
     </div>
   );
 };

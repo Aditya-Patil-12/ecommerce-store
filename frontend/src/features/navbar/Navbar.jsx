@@ -8,7 +8,13 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useSelector, useDispatch } from "react-redux";
+// ===============================================================================================
+import {
+  Bars3Icon,
+  ShoppingCartIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 const user = {
   name: "Tom Cook",
   email: "tom@example.com",
@@ -16,20 +22,24 @@ const user = {
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
 };
 const navigation = [
-  { name: "Dashboard", href: "#", current: true },
+  { name: "Products", link: "/products", current: true },
+  { name: "Cart", link: "/cart", current: true },
+  { name: "CheckOut", link: "/checkout", current: true },
+  // { name: "OrdersSuccess", link: "/order-success", current: true },
 ];
 
 const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Your Profile", link: "/profile" },
+  { name: "My Orders", link: "/orders" },
+  { name: "Logout", link: "/logout" },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-
-function Navbar({children}) {
+function Navbar({ children }) {
+  const dispatch = useDispatch();
+  const totalItems = useSelector((state) => state.cart.totalItems);
   return (
     <>
       <div className="min-h-full">
@@ -47,9 +57,9 @@ function Navbar({children}) {
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.link}
                         aria-current={item.current ? "page" : undefined}
                         className={classNames(
                           item.current
@@ -59,7 +69,7 @@ function Navbar({children}) {
                         )}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -69,16 +79,19 @@ function Navbar({children}) {
                   {/* <div className="relative"> */}
                   <Link to="/cart" className="relative">
                     <button className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden border-2">
-                      <span className="absolute -inset-1.5"/>
+                      <span className="absolute -inset-1.5" />
                       <span className="sr-only">View notifications</span>
                       <ShoppingCartIcon
                         aria-hidden="true"
                         className="size-6 "
                       />
                     </button>
+                    {
+                      (totalItems > 0) && 
                     <span className="absolute inline-flex items-center rounded-md -top-3 left-4 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/10 ring-inset">
-                      10
+                      {totalItems}
                     </span>
+                    }
                   </Link>
                   {/* </div> */}
 
@@ -101,12 +114,12 @@ function Navbar({children}) {
                     >
                       {userNavigation.map((item) => (
                         <MenuItem key={item.name}>
-                          <a
-                            href={item.href}
+                          <Link
+                            to={item.link}
                             className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                           >
                             {item.name}
-                          </a>
+                          </Link>
                         </MenuItem>
                       ))}
                     </MenuItems>
@@ -169,35 +182,32 @@ function Navbar({children}) {
                 </div>
 
                 <Link to="/cart" className="relative">
-
                   <button
                     type="button"
                     className="ml-auto shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden border-2"
                   >
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">View notifications</span>
-                      <ShoppingCartIcon
-                        aria-hidden="true"
-                        className="size-6 "
-                      ></ShoppingCartIcon>
+                    <ShoppingCartIcon
+                      aria-hidden="true"
+                      className="size-6 "
+                    ></ShoppingCartIcon>
                   </button>
-                    <span
-                      className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/10 ring-inset absolute -top-3 left-7"
-                    >
-                      Mobile
-                    </span>
+                  <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/10 ring-inset absolute -top-3 left-7">
+                    Mobile
+                  </span>
                 </Link>
               </div>
               <div className="mt-3 space-y-1 px-2">
                 {userNavigation.map((item) => (
-                  <DisclosureButton
+                  <Link
+                    to=""
                     key={item.name}
                     as="a"
-                    href={item.href}
                     className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                   >
                     {item.name}
-                  </DisclosureButton>
+                  </Link>
                 ))}
               </div>
             </div>

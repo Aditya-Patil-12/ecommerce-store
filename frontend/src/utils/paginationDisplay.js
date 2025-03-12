@@ -1,7 +1,16 @@
 
-export default function paginationDisplay(pageNumber,totalPages){
+export default function paginationDisplay({pageNumber,totalPages}){
+    // console.log("what is the input");
+    
     if( totalPages <= 6 ){
-        return Array.from({length:totalPages});
+        if( totalPages === 0 ){
+            return [];
+        } 
+        let pages = [];
+        for(let page=1;page<=totalPages;page++){
+            pages.push(page);
+        }
+        return pages;
     }
     if( pageNumber <= 3 ){
         return ["1","2","3","4","...",totalPages];

@@ -1,9 +1,13 @@
 import React from "react";
 import { Link } from "react-router";
 const ProductsComponent = ({products}) => {
+  // console.log("give me", products);
+  
   if( !products ){
     return <div>Loading ...</div>
   }
+  // console.log(products);
+  
   // console.log("Inside product components", products);
   return (
     <div className="bg-white">

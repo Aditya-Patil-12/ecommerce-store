@@ -1,46 +1,54 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router";
-
-const products = [
-  {
-    id: 1,
-    name: "Throwback Hip Bag",
-    href: "#",
-    color: "Salmon",
-    price: "$90.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-01.jpg",
-    imageAlt:
-      "Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.",
-  },
-  {
-    id: 2,
-    name: "Medium Stuff Satchel",
-    href: "#",
-    color: "Blue",
-    price: "$32.00",
-    quantity: 1,
-    imageSrc:
-      "https://tailwindui.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-02.jpg",
-    imageAlt:
-      "Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.",
-  },
-  // More products...
-];
+import { FaPlus,FaMinus } from "react-icons/fa6";
+import { MdDelete } from "react-icons/md";
+import { Link,Navigate } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
+import { updateCartItemAsync,deleteCartItemAsync } from "./CartSlice";
 
 export default function Cart() {
   const [open, setOpen] = useState(true);
+  const dispatch = useDispatch();
+  const totalItems = useSelector((state) => state.cart.totalItems);
+  const amount = useSelector((state) => state.cart.amount);
+  const isCartFetched = useSelector((state)=>state.cart.status);
+  const products = useSelector((state)=>state.cart.cart);
+  // console.log("*(*(*(*(*(*H",isCartFetched,"  ",products);
+  
+  const handleRemove = async (item)=>{
+    await dispatch(deleteCartItemAsync({ 
+      id:(item.id) ,
+      updateByAmount: -((+item.quantity)*(+item.price)) ,
+      updateByItem:(-(+item.quantity)) 
+    }));
+  }
+  const handleChange = async (value, item) => {
+    // + means this for integer
+    console.log("tell the updated Value",value);
+    if( (value) == (item.quantity) ) return ;
+    if( value == 0 ) handleRemove(item);
+    else {
+      await dispatch(updateCartItemAsync({item:item,newQuantity:(value)}));
+    }
+  };
 
+  const generateOptions = (value)=>{
+    return Array.from({length:+value},(_,index)=>(
+      <option
+        key={index+1} 
+        value={`${index+1}`}>
+          {index+1}
+      </option>
+    ));
+  }
+  
+  if ( (isCartFetched === "idle") && products.length === 0) {
+    return <Navigate to="/products"  />;
+  }
+  if( isCartFetched === "loading" ){
+    return <h1>Loading ...</h1>
+  }
+  // console.log(generateOptions(12));
   return (
-
     <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
       <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 ">
         <div className="flex items-start justify-between">
@@ -54,8 +62,8 @@ export default function Cart() {
                 <li key={product.id} className="flex py-6">
                   <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
                     <img
-                      alt={product.imageAlt}
-                      src={product.imageSrc}
+                      src={product?.images[0]}
+                      alt={product.title}
                       className="size-full object-cover"
                     />
                   </div>
@@ -64,25 +72,48 @@ export default function Cart() {
                     <div>
                       <div className="flex justify-between text-base font-medium text-gray-900">
                         <h3>
-                          <a href={product.href}>{product.name}</a>
+                          <a href={product.href}>{product.title}</a>
                         </h3>
                         <p className="ml-4">{product.price}</p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500">
-                        {product.color}
+                        {product.color.name}
                       </p>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
-                      <p className="text-gray-500">
-                        Qty
-                        <select className="ml-2">
-                          <option value="1" >1</option>
-                          <option value="1">2</option>
-                        </select>
-                      </p>
-
+                      <div className="quantityChange w-17 flex justify-between">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleChange(
+                              Math.max(0, product.quantity - 1),
+                              product
+                            )
+                          }
+                          className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                        >
+                                    {
+                                      (product.quantity === 1) ? (<MdDelete/>) :(<FaMinus />)
+                                    }
+                        </button>
+                        <p >{product.quantity}</p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleChange(
+                              Math.min(product.stock, product.quantity + 1),
+                              product
+                            )
+                          }
+                          className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                        >
+                          {" "}
+                          <FaPlus />{" "}
+                        </button>
+                      </div>
                       <div className="flex">
                         <button
+                          onClick={() => handleRemove(product)}
                           type="button"
                           className="font-medium text-indigo-600 hover:text-indigo-500"
                         >
@@ -99,9 +130,13 @@ export default function Cart() {
       </div>
 
       <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-        <div className="flex justify-between text-base font-medium text-gray-900">
+        <div className="flex justify-between  text-base font-medium text-gray-900">
           <p>Subtotal</p>
-          <p>$262.00</p>
+          <p className="mx-2">$ {Math.round(amount * 100) / 100}</p>
+        </div>
+        <div className="flex justify-between  text-base font-medium text-gray-900">
+          <p>Total Items</p>
+          <p className="mx-2">{totalItems}</p>
         </div>
         <p className="mt-0.5 text-sm text-gray-500">
           Shipping and taxes calculated at checkout.
@@ -117,7 +152,8 @@ export default function Cart() {
         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
           <p>
             or{" "}
-            <Link to="/"
+            <Link
+              to="/products"
               type="button"
               onClick={() => setOpen(false)}
               className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -132,24 +168,21 @@ export default function Cart() {
   );
 }
 
+// <Dialog open={open} onClose={setOpen} className="relative z-10">
 
+//   <div className="fixed inset-0 overflow-hidden">
+//     <div className="absolute inset-0 overflow-hidden">
+//       <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+//         {/* <DialogPanel
+//           transition
+//           className="pointer-events-auto w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+//         > */}
 
-    // <Dialog open={open} onClose={setOpen} className="relative z-10">
-
-    //   <div className="fixed inset-0 overflow-hidden">
-    //     <div className="absolute inset-0 overflow-hidden">
-    //       <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-    //         {/* <DialogPanel
-    //           transition
-    //           className="pointer-events-auto w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
-    //         > */}
-              
-    //         {/* </DialogPanel> */}
-    //       </div>
-    //     </div>
-    //   </div>
-    // </Dialog>
-
+//         {/* </DialogPanel> */}
+//       </div>
+//     </div>
+//   </div>
+// </Dialog>
 
 /*
 Modal Type feel
