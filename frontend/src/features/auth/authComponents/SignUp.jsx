@@ -5,6 +5,7 @@ import { createUserAsync } from "../AuthSlice";
 import verifyRegisterDetails from "../../../utils/checkRegisterDetails";
 import PasswordGuideLines from "./PasswordGuideLines";
 import { Navigate } from "react-router";
+import { ToastContainer,toast } from "react-toastify";
 export default function SignUp() {
   const [isGuidelinesOpen, setIsGuidlinesOpen] = useState(false);
   const [isRegistered,setIsRegistered] =useState(false);
@@ -29,9 +30,13 @@ export default function SignUp() {
       };
       registerUser();
     }
+    else{
+      toast.info(verify.msg);
+    }
   };
   return (
     <>
+    <ToastContainer/>
       {isRegistered && <Navigate to="/login" replace={true} />}
 
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -47,7 +52,7 @@ export default function SignUp() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form noValidate onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="userName"

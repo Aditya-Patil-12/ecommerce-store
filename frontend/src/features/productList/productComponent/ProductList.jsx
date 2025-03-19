@@ -21,9 +21,9 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-
+import { setSortQuery, setFilterQuery } from "../productListSlice";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-
+import {ThreeDots} from 'react-loader-spinner'
 import {
   ChevronDownIcon,
   FunnelIcon,
@@ -46,13 +46,14 @@ export default function ProductList() {
   const products = useSelector((state) => state.product.products);
   const filters = useSelector((state) => state.product.filters);
   const page = useSelector((state) => state.product.page);
-
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [filterQuery, setFilterQuery] = useState({});
-  const [sortQuery, setSortQuery] = useState({});
+  const filterQuery = useSelector((state) => state.product.filterQuery);
+  const sortQuery = useSelector((state) => state.product.sortQuery);
   const dispatch = useDispatch();
   const totalItems = useSelector((state) => state.product.totalItems);
 
+  console.log(status);
+  
   useEffect(() => {
     
     const fetchData = async () => {
@@ -80,7 +81,7 @@ export default function ProductList() {
 const handleFilters = ({ filterType, value ,checked }) => {
   // console.log(filterType, " ", value);
   
-  const newFilters = { ...filterQuery };
+    const newFilters = JSON.parse(JSON.stringify({ ...filterQuery }));
 
   if( checked ){
     if(newFilters[`${filterType}`] ){
@@ -90,8 +91,8 @@ const handleFilters = ({ filterType, value ,checked }) => {
       newFilters[`${filterType}`]=[value];
     }
     // console.log(newFilters);
-    setFilterQuery(newFilters);
-    dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
+    dispatch(setFilterQuery(newFilters));
+    // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
   }
   else{
     // for object deletion .....
@@ -99,12 +100,11 @@ const handleFilters = ({ filterType, value ,checked }) => {
     let index = newFilters[`${filterType}`].findIndex((reqValue)=> reqValue === value);
     newFilters[`${filterType}`].splice(index,1);
     // console.log("*&%& IOverHere",newFilters);
-    setFilterQuery(newFilters);
-    dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
+    dispatch(setFilterQuery(newFilters));
+    // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
   }
   return;
 };
-
   return (
     <div className="bg-white">
       <div>
@@ -122,7 +122,6 @@ const handleFilters = ({ filterType, value ,checked }) => {
           filters={filters}
           handleFilters={handleFilters}
           setMobileFiltersOpen={setMobileFiltersOpen}
-          setSortQuery={setSortQuery}
           page={page}
         />
       </div>
@@ -365,15 +364,15 @@ function DesktopComponent({
   filters,
   setMobileFiltersOpen,
   handleFilters,
-  setSortQuery,
   page
 }) {
-
+  const dispatch = useDispatch();
+  const status = useSelector((state) => state.product.status);
   const handleSort = (e, options) => {
     let value = options.sort;
     if (options.order === "desc") value= "-" + value;
     // console.log(options);
-    setSortQuery({ filterType: "_sort", value: value });
+    dispatch(setSortQuery({ filterType: "_sort", value: value }));
   };
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -452,7 +451,23 @@ function DesktopComponent({
 
           {/* Product grid */}
           <div className="lg:col-span-5">
-            {<ProductsComponent products={products} />}
+            {
+              status === "loading" ?(
+                <div className="flex justify-center">
+                  <ThreeDots
+                    visible={true}
+                    height="80"
+                    width="80"
+                    color="#4fa94d"
+                    radius="9"
+                    ariaLabel="three-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    className=""
+                  />
+                </div>
+              ):(<ProductsComponent products={products} />)
+            }
           </div>
         </div>
       </section>

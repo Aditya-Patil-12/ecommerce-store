@@ -26,24 +26,43 @@
 
 // // category.charAt(0).toUpperCase()+category.slice(1)
 
-let filters ={
-  "category":"beauty",
-  "page":"12",
-};
-let sort ="price",order="desc";
-const newFilters = {
-  ...filters,
-  _sort: (order === "asc") ? sort : "-" + sort,
-};
+// let filters ={
+//   "category":"beauty",
+//   "page":"12",
+// };
+// let sort ="price",order="desc";
+// const newFilters = {
+//   ...filters,
+//   _sort: (order === "asc") ? sort : "-" + sort,
+// };
+
+// let queryString = "";
+// for (let [key, value] of Object.entries(newFilters)) {
+//   queryString += (key) + "=" + (value) + "&";
+// }
+// console.log(queryString.slice(0,queryString.length-1));
+
+
+// let val ={};
+// if( val != {} ){
+//   console.log("ehhlo"); 
+// }
+
+
 
 let queryString = "";
-for (let [key, value] of Object.entries(newFilters)) {
-  queryString += (key) + "=" + (value) + "&";
+let sortFilter = Object.entries(sortQuery);
+if (sortFilter.length != 0) {
+  queryString += "sort=";
 }
-console.log(queryString.slice(0,queryString.length-1));
-
-
-let val ={};
-if( val != {} ){
-  console.log("ehhlo"); 
+for (let [key, value] of sortFilter) {
+  if (value == "desc") {
+    queryString += "-";
+  }
+  queryString += key + ",";
 }
+if (sortFilter.length != 0) {
+  console.log("inside  ", queryString[queryString.length - 1]);
+  queryString = queryString.slice(0, -1) + "&";
+}
+console.log(sortFilter,"  ",queryString);

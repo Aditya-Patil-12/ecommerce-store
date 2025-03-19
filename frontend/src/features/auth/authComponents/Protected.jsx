@@ -7,6 +7,11 @@ const Protected = ({ children }) => {
   if (!user) {
     return <Navigate to="/login" replace={true}></Navigate>;
   }
+  if( user && user.role === "admin" ){
+    {
+      return <Navigate to="/admin" replace={true}></Navigate>;
+    }
+  }
   return children;
 };
 export default Protected;

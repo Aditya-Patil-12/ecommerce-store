@@ -5,7 +5,7 @@ import { Navigate, useParams } from "react-router";
 import { fetchProductDetailAsync } from "../productList/productListSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { addToCartAsync } from "../../cart/CartSlice";
+import { addToCartAsync } from "../cart/CartSlice";
 
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
@@ -32,12 +32,12 @@ function classNames(...classes) {
 export default function AdminProductDetails() {
   // useParams returns in key value pair ...
   const dispatch = useDispatch();
-  const { id } = useParams();
+  const { productId } = useParams();
 
   const product = useSelector((state) => state.product.currentProduct);
   const status = useSelector((state) => state.product.status);
-  const { id: userId } = useSelector((state) => state.user.userInfo);
-
+  const userInfo = useSelector((state) => state.user.userInfo);
+  // const {id} = userInfo;
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedSize, setSelectedSize] = useState(sizes[2]);
   const [quantity, setQuantity] = useState(0);
@@ -45,7 +45,7 @@ export default function AdminProductDetails() {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      await dispatch(fetchProductDetailAsync(id));
+      await dispatch(fetchProductDetailAsync(productId));
       // console.log("going inside over");
     };
     fetchProduct();

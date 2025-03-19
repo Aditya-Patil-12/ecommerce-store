@@ -13,11 +13,19 @@ import {
   UserProfilePage,
   PageNotFound,
   OrderSuccessPage,
+  SharedLayoutPage,
   HomePage,
   ProductsPage,
-  ForgotPasswordPage
+  ForgotPasswordPage,
+  AdminHomePage,
+  AdminProductDetailPage,
+  AdminOrdersPage,
+  AdminProductPage,
+  AdminProductFormPage
 } from "./pages";
+import Demo from "./pages/Demo";
 import Protected from "./features/auth/authComponents/Protected";
+import ProtectedAdmin from "./features/auth/authComponents/ProtectedAdmin";
 import { fetchUserItemsAsync } from "./features/cart/CartSlice";
 import { loggedInUserInfoAsync } from "./features/user/UserSlice";
 
@@ -49,22 +57,30 @@ function App() {
         <Route
           path="/logout"
           element={
-            <Protected>
+            // <Protected>
               <LogoutPage />
-            </Protected>
+            // </Protected>
           }
         />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         {/* ======================================== */}
-
+        {/* TODO : Provide the Home Page (Landing Page access to Any User) */}
         <Route
           path="/"
           element={
             <Protected>
-              <HomePage />
+              <SharedLayoutPage />
             </Protected>
           }
         >
+          <Route
+            index
+            element={
+              <Protected>
+                <HomePage />
+              </Protected>
+            }
+          />
           <Route
             path="/products"
             element={
@@ -130,6 +146,67 @@ function App() {
 
           <Route path="*" element={<PageNotFound />} />
         </Route>
+
+        {/* Admin Routes ===============================*/}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdmin>
+              <SharedLayoutPage />
+            </ProtectedAdmin>
+          }
+        >
+          <Route
+            index
+            element={
+              <ProtectedAdmin>
+                <AdminHomePage />
+              </ProtectedAdmin>
+            }
+          />
+          <Route
+            path="products"
+            element={
+              <ProtectedAdmin>
+                <AdminProductPage />
+              </ProtectedAdmin>
+            }
+          />
+          <Route
+            path="product-detail/:id"
+            element={
+              <ProtectedAdmin>
+                <AdminProductDetailPage />
+              </ProtectedAdmin>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <ProtectedAdmin>
+                <AdminOrdersPage />
+              </ProtectedAdmin>
+            }
+          />
+          <Route
+            path="productForm"
+            element={
+              <ProtectedAdmin>
+                <AdminProductFormPage />
+              </ProtectedAdmin>
+            }
+          />
+          <Route
+            path="productForm/edit/:id"
+            element={
+              <ProtectedAdmin>
+                <AdminProductFormPage />
+              </ProtectedAdmin>
+            }
+          />
+        </Route>
+        {/* ========================== */}
+        <Route path="/demo" element = {<Demo/>}/>
       </Routes>
     </BrowserRouter>
   );

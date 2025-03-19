@@ -2,6 +2,7 @@
 import { default as axios } from "axios";
 import { productListLimit } from "../../app/constants";
 import { useSelector } from "react-redux";
+
 async function productListAPI() {
   // console.log("entered to fetch data");
   const response = await axios.get(
@@ -30,6 +31,7 @@ async function productsByFiltersAPI({filterQuery, sortQuery,page}) {
   // "http://localhost:5000/api/v1/product/getAllProducts"
   
   // console.log("are differcent",page," ",useSelector((state)=>state.product.page));
+  console.log(filterQuery," ",sortQuery," ",page);
   
   let queryString = "";
   for (let [key, value] of Object.entries(filterQuery)) {
@@ -38,14 +40,14 @@ async function productsByFiltersAPI({filterQuery, sortQuery,page}) {
     }
   }
   if( Object.keys(sortQuery).length ){
-    queryString += (sortQuery.filterType+"="+value[value.length-1]+"&");
+    queryString += (sortQuery.filterType+"="+sortQuery.value+"&");
   }
   // console.log("Not showiung\n"+ productListLimit);
   
   queryString += "_page="+`${page}`+"&_per_page="+`${productListLimit}`;
   // if (queryString) queryString = queryString.slice(0, queryString.length - 1);
 
-  // console.log("fetching for ", queryString);
+  console.log("fetching for ", queryString);
   try {
     const response = await axios.get(
       `http://localhost:5000/products?` + `${queryString}`
@@ -74,10 +76,34 @@ async function productsFiltersListAPI() {
     return { msg: "Fetching Filters Error" };
   }
 }
+const addProductAPI = async(product) =>{
+  try {
+    console.log(product);
+    const response = await axios.post(`http://localhost:5000/products`,product);
+    console.log(response);
+    return {data:response.data,success:true};
+  } catch (error) {
+    return { msg: "Add A New Product Error", success:false };
+  }
+}
+const editProductAPI = async (product) => {
+  let response;
+  try {
+    console.log(product);
+    response = await axios.patch(`http://localhost:5000/products/${product.id}`, product);
+    console.log(response);
+  } catch (error) {
+    return { msg: "Fetching Filters Error", success: false };
+  }
+  return { data:response.data, success: true };
+};
 
 export {
   singleProductAPI,
   productListAPI,
   productsByFiltersAPI,
   productsFiltersListAPI,
+  addProductAPI,
+  editProductAPI,
 };
+

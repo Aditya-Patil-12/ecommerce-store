@@ -58,7 +58,8 @@
       "images": [
         "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/1.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png",
+      "deleted": false
     },
     {
       "id": "2",
@@ -118,7 +119,8 @@
       "images": [
         "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/1.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png",
+      "deleted": false
     },
     {
       "id": "3",
@@ -178,7 +180,8 @@
       "images": [
         "https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/1.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/thumbnail.png",
+      "deleted": false
     },
     {
       "id": "4",
@@ -238,7 +241,8 @@
       "images": [
         "https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/1.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "5",
@@ -298,7 +302,8 @@
       "images": [
         "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/1.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "6",
@@ -360,7 +365,8 @@
         "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/2.png",
         "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/3.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "7",
@@ -422,7 +428,8 @@
         "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/2.png",
         "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/3.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "8",
@@ -484,7 +491,8 @@
         "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/2.png",
         "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/3.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "9",
@@ -546,7 +554,8 @@
         "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/2.png",
         "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/3.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/thumbnail.png",
+      "deleted": true
     },
     {
       "id": "10",
@@ -5951,10 +5960,10 @@
       "title": "Apple Airpods",
       "description": "The Apple Airpods offer a seamless wireless audio experience. With easy pairing, high-quality sound, and Siri integration, they are perfect for on-the-go listening.",
       "category": "mobile-accessories",
-      "price": 129.99,
-      "discountPercentage": 4.82,
+      "price": "129.99",
+      "discountPercentage": "4.82",
       "rating": 4.38,
-      "stock": 93,
+      "stock": "94",
       "tags": [
         "electronics",
         "wireless earphones"
@@ -6006,7 +6015,26 @@
         "https://cdn.dummyjson.com/products/images/mobile-accessories/Apple%20Airpods/2.png",
         "https://cdn.dummyjson.com/products/images/mobile-accessories/Apple%20Airpods/3.png"
       ],
-      "thumbnail": "https://cdn.dummyjson.com/products/images/mobile-accessories/Apple%20Airpods/thumbnail.png"
+      "thumbnail": "https://cdn.dummyjson.com/products/images/mobile-accessories/Apple%20Airpods/thumbnail.png",
+      "deleted": false
+    },
+    {
+      "id": "101",
+      "title": "Motor",
+      "description": "",
+      "price": "12",
+      "discountPercentage": "4.82",
+      "stock": "94",
+      "category": "furniture",
+      "brand": "Essence",
+      "returnPolicy": "60 days return policy",
+      "thumbnail": "https://4.imimg.com/data4/XU/DA/MY-15373727/ie2-motor-500x500.jpg",
+      "images": [
+        "https://4.imimg.com/data4/XU/DA/MY-15373727/ie2-motor-500x500.jpg",
+        "https://4.imimg.com/data4/XU/DA/MY-15373727/ie2-motor-500x500.jpg",
+        "https://4.imimg.com/data4/XU/DA/MY-15373727/ie2-motor-500x500.jpg"
+      ],
+      "deleted": false
     }
   ],
   "filters": {
@@ -6269,14 +6297,6 @@
       "confirmPassword": "Adi12@12"
     },
     {
-      "id": "bdda",
-      "userName": "dummy",
-      "email": "dummy@gmail.com",
-      "password": "Adi12@12",
-      "addresses": [],
-      "confirmPassword": "Adi12@12"
-    },
-    {
       "id": "163b",
       "userName": "Tom",
       "email": "timmy@gmail.com",
@@ -6294,10 +6314,83 @@
           "postal-code": "123122"
         }
       ],
-      "role": "customer"
+      "role": "admin"
     }
   ],
-  "cart": [],
+  "cart": [
+    {
+      "id": "8e9b",
+      "userId": "3382",
+      "quantity": "2",
+      "color": {
+        "name": "White",
+        "class": "bg-white",
+        "selectedClass": "ring-gray-400"
+      },
+      "size": {
+        "name": "XL",
+        "inStock": true
+      },
+      "title": "Essence Mascara Lash Princess",
+      "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
+      "category": "beauty",
+      "price": 9.99,
+      "discountPercentage": 7.17,
+      "rating": 4.94,
+      "stock": 5,
+      "tags": [
+        "beauty",
+        "mascara"
+      ],
+      "brand": "Essence",
+      "sku": "RCH45Q1A",
+      "weight": 2,
+      "dimensions": {
+        "width": 23.17,
+        "height": 14.43,
+        "depth": 28.01
+      },
+      "warrantyInformation": "1 month warranty",
+      "shippingInformation": "Ships in 1 month",
+      "availabilityStatus": "Low Stock",
+      "reviews": [
+        {
+          "rating": 2,
+          "comment": "Very unhappy with my purchase!",
+          "date": "2024-05-23T08:56:21.618Z",
+          "reviewerName": "John Doe",
+          "reviewerEmail": "john.doe@x.dummyjson.com"
+        },
+        {
+          "rating": 2,
+          "comment": "Not as described!",
+          "date": "2024-05-23T08:56:21.618Z",
+          "reviewerName": "Nolan Gonzalez",
+          "reviewerEmail": "nolan.gonzalez@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very satisfied!",
+          "date": "2024-05-23T08:56:21.618Z",
+          "reviewerName": "Scarlett Wright",
+          "reviewerEmail": "scarlett.wright@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 24,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.618Z",
+        "updatedAt": "2024-05-23T08:56:21.618Z",
+        "barcode": "9164035109868",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png",
+      "deleted": false
+    }
+  ],
   "orders": [
     {
       "id": "830e",
@@ -6308,7 +6401,7 @@
         "email": "john@gmail.com",
         "phoneNo": "9326573816",
         "country": "India",
-        "street-address": "A/31 PAVITRA CO-0P SCOCIETY LTD , OVARI PADA, SV ROAD, DAHISAR(E) MUMBAI 400068 MAHARASHTRA",
+        "street-address": "A/31 PAVITRA CO-0P SCOCIETY LTD , OVARI PADA, SV ROAD",
         "region": "Maharashtra",
         "city": "Pune",
         "postal-code": "411041"
@@ -6698,7 +6791,7 @@
       ],
       "totalAmount": 769.53,
       "totalItems": 47,
-      "status": "pending"
+      "status": "delivered"
     },
     {
       "id": "c94a",
@@ -6952,7 +7045,7 @@
       ],
       "totalAmount": 699.65,
       "totalItems": 35,
-      "status": "pending"
+      "status": "dispatched"
     },
     {
       "id": "9062",
@@ -7223,7 +7316,7 @@
       ],
       "totalAmount": 2.49,
       "totalItems": 1,
-      "status": "pending"
+      "status": "dispatched"
     },
     {
       "id": "fb17",
@@ -7314,7 +7407,7 @@
       ],
       "totalAmount": 399.79999999999995,
       "totalItems": 20,
-      "status": "pending"
+      "status": "canceled"
     }
   ]
 }

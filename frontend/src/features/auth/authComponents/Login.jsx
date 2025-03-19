@@ -7,6 +7,7 @@ import { useSelector,useDispatch } from "react-redux";
 import verifyRegisterDetails from "../../../utils/checkRegisterDetails";
 import { checkUserAsync } from "../AuthSlice";
 import { setIsLogin } from "../AuthSlice";
+import { ToastContainer, toast } from 'react-toastify';
 export default function Login() {
   const dispatch = useDispatch();
   const [role, setRole] = useState("customer");
@@ -17,6 +18,8 @@ export default function Login() {
     const data = Object.fromEntries(formData);
     console.log(data);
     const verify = verifyRegisterDetails({...data,login:true});
+    console.log(verify);
+    
     if( verify.success ){
       const fetchUser = async () => {
         await dispatch(setIsLogin(true));
@@ -25,11 +28,15 @@ export default function Login() {
       };
       fetchUser(); 
     }
+    else{
+      toast("Invalid credentials");
+    }
   };
   console.log(role);
   
   return (
     <>
+    <ToastContainer/>
       {userInfo && <Navigate to="/products" replace={true} />}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -44,7 +51,7 @@ export default function Login() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form noValidate onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
@@ -57,9 +64,7 @@ export default function Login() {
                   id="email"
                   name="email"
                   type="email"
-                  // onChange={handleChange}
                   required
-                  autoComplete="email"
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import ProductsComponent from "../productList/ProductsComponent";
-import ProductPagination from "../productList/ProductPagination";
-
+import AdminProductComponent from "./AdminProductComponent";
+import ProductPagination from "../productList/productComponent/ProductPagination";
+import { Link } from "react-router";
 import {
-  fetchProductListAsync,
   fetchProductByFiltersAsync,
   fetchProductsFiltersAsync,
   setPage,
@@ -21,6 +20,8 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
+import { setSortQuery,setFilterQuery } from "../productList/productListSlice";
+import { ThreeDots } from "react-loader-spinner";
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -43,15 +44,21 @@ function classNames(...classes) {
 }
 
 export default function AdminProductList() {
+  const dispatch = useDispatch();
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
   const products = useSelector((state) => state.product.products);
   const filters = useSelector((state) => state.product.filters);
   const page = useSelector((state) => state.product.page);
 
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [filterQuery, setFilterQuery] = useState({});
-  const [sortQuery, setSortQuery] = useState({});
-  const dispatch = useDispatch();
+  const filterQuery =  useSelector((state)=>state.product.filterQuery);
+  const sortQuery = useSelector((state) => state.product.sortQuery);
+
+
   const totalItems = useSelector((state) => state.product.totalItems);
+  console.log("hello Admin here");
+
+  // Get All Products through Filters ======> 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +71,7 @@ export default function AdminProductList() {
     fetchData();
   }, [dispatch, filterQuery, sortQuery, page]);
 
+  // Helps to get All Filtes ====>
   useEffect(() => {
     const fetchData = async () => {
       // console.log("******************Fetching for Filters");
@@ -72,6 +80,7 @@ export default function AdminProductList() {
     fetchData();
   }, [dispatch]);
 
+  // just to be on the firstPage when ever filterQuery or Sort Query is changed ......
   useEffect(() => {
     // console.log("check for page())()()()()(",page);
     // const change= async ()=.
@@ -80,8 +89,10 @@ export default function AdminProductList() {
 
   const handleFilters = ({ filterType, value, checked }) => {
     // console.log(filterType, " ", value);
-
-    const newFilters = { ...filterQuery };
+    console.log(filterType," ",value,"  ",checked);
+    
+    const newFilters = JSON.parse(JSON.stringify({ ...filterQuery }));
+    console.log(newFilters);
 
     if (checked) {
       if (newFilters[`${filterType}`]) {
@@ -89,9 +100,9 @@ export default function AdminProductList() {
       } else {
         newFilters[`${filterType}`] = [value];
       }
-      // console.log(newFilters);
-      setFilterQuery(newFilters);
-      dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
+      console.log(newFilters);
+      dispatch(setFilterQuery(newFilters));
+      // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
     } else {
       // for object deletion .....
       // delete newFilters[`${filterType}`];
@@ -99,9 +110,9 @@ export default function AdminProductList() {
         (reqValue) => reqValue === value
       );
       newFilters[`${filterType}`].splice(index, 1);
-      // console.log("*&%& IOverHere",newFilters);
-      setFilterQuery(newFilters);
-      dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
+      console.log("*&%& IOverHere",newFilters);
+      dispatch(setFilterQuery(newFilters));
+      // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
     }
     return;
   };
@@ -123,7 +134,6 @@ export default function AdminProductList() {
           filters={filters}
           handleFilters={handleFilters}
           setMobileFiltersOpen={setMobileFiltersOpen}
-          setSortQuery={setSortQuery}
           page={page}
         />
       </div>
@@ -365,14 +375,15 @@ function DesktopComponent({
   filters,
   setMobileFiltersOpen,
   handleFilters,
-  setSortQuery,
   page,
 }) {
+  const status = useSelector((state) => state.product.status);
+  const dispatch = useDispatch();
   const handleSort = (e, options) => {
     let value = options.sort;
     if (options.order === "desc") value = "-" + value;
     // console.log(options);
-    setSortQuery({ filterType: "_sort", value: value });
+    dispatch(setSortQuery({ filterType: "_sort", value: value }));
   };
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -450,8 +461,32 @@ function DesktopComponent({
           {/* Filters end ============ */}
 
           {/* Product grid */}
-          <div className="lg:col-span-5">
-            {<ProductsComponent products={products} />}
+          <div className="lg:col-span-5 border-8">
+            {status === "loading" ? (
+              <div className="flex justify-center">
+                <ThreeDots
+                  visible={true}
+                  height="80"
+                  width="80"
+                  color="#4fa94d"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                  className=""
+                />
+              </div>
+            ) : (
+              <>
+              <Link
+                to="/admin/productForm"
+                className="mx-auto sm:mx-6 inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-6 py-2 text-base font-medium text-white shadow-xs hover:bg-green-700 cursor-pointer"
+              >
+                Add New Product
+              </Link>
+              {<AdminProductComponent products={products} page={page} />}
+              </>
+            )}
           </div>
         </div>
       </section>

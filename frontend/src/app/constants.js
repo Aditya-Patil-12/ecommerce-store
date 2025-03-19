@@ -1,3 +1,3 @@
-const productListLimit = 9;
+const productListLimit = 10;
 
 export {productListLimit};

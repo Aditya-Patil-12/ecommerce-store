@@ -15,6 +15,7 @@ import {
   ShoppingCartIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { current } from "@reduxjs/toolkit";
 const user = {
   name: "Tom Cook",
   email: "tom@example.com",
@@ -22,10 +23,11 @@ const user = {
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
 };
 const navigation = [
-  { name: "Products", link: "/products", current: true },
-  { name: "Cart", link: "/cart", current: true },
-  { name: "CheckOut", link: "/checkout", current: true },
-  // { name: "OrdersSuccess", link: "/order-success", current: true },
+  { name: "Products", link: "/products", customer: true },
+  { name: "Cart", link: "/cart", customer: true },
+  { name: "CheckOut", link: "/checkout", customer: true },
+  {name: "Products",link:'/admin/products',admin:true},
+  {name:"Orders" ,link:'/admin/orders',admin:true},
 ];
 
 const userNavigation = [
@@ -38,8 +40,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 function Navbar({ children }) {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const totalItems = useSelector((state) => state.cart.totalItems);
+  const userInfo = useSelector((state)=>state.user.userInfo);
+
   return (
     <>
       <div className="min-h-full">
@@ -47,16 +51,18 @@ function Navbar({ children }) {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
-                <div className="shrink-0">
+                <Link to="/" className="shrink-0">
                   <img
                     alt="Your Company"
                     src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
                     className="size-8"
                   />
-                </div>
+                </Link>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navigation.map((item) => (
+                      
+                        item[userInfo?.role] ? 
                       <Link
                         key={item.name}
                         to={item.link}
@@ -69,7 +75,7 @@ function Navbar({ children }) {
                         )}
                       >
                         {item.name}
-                      </Link>
+                      </Link>:null
                     ))}
                   </div>
                 </div>

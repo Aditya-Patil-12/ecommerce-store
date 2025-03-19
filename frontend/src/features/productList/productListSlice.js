@@ -1,5 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { productListAPI,singleProductAPI,productsByFiltersAPI,productsFiltersListAPI } from "./productListAPI";
+import {
+  productListAPI,
+  singleProductAPI,
+  productsByFiltersAPI,
+  productsFiltersListAPI,
+  addProductAPI,
+  editProductAPI,
+} from "./productListAPI";
 import { productListLimit } from "../../app/constants";
 
 const initialState = {
@@ -8,6 +15,8 @@ const initialState = {
   currentProduct:null,
   totalItems: 0,
   page: 1,
+  filterQuery:{},
+  sortQuery:{},
   status: "idle",
 };
 
@@ -48,7 +57,6 @@ const fetchProductByFiltersAsync = createAsyncThunk(
   }
 );
 
-
 const fetchProductsFiltersAsync = createAsyncThunk(
   "product/fetchProductsFiltersDetail",
   async () => {
@@ -58,6 +66,29 @@ const fetchProductsFiltersAsync = createAsyncThunk(
     return {
       data: response,
     };
+  }
+);
+
+const addProductAsync = createAsyncThunk(
+  "product/addProductDetails",
+  async (product)=>{
+    const resp = await addProductAPI(product);
+    if (resp.success) {
+      return { data: resp.data, success: true };
+    }
+    return { success: false };
+})
+
+const editProductAsync = createAsyncThunk(
+  "product/editProductDetails",
+  async (product) => {
+    const resp = await editProductAPI(product);
+    console.log(resp);
+    
+    if (resp.success) {
+      return { data: resp.data, success: true };
+    }
+    else return { success: false };
   }
 );
 
@@ -88,6 +119,15 @@ export const productSlice = createSlice({
       state.totalItems= 0;
       state.page= 1;
       state.status= "idle";
+    },
+    clearSelectedProduct: (state)=>{
+      state.currentProduct = null;
+    },
+    setFilterQuery:(state,action)=>{
+      state.filterQuery=action.payload;
+    },
+    setSortQuery :(state,action)=>{
+      state.sortQuery = action.payload;
     }
   },
   // underscore is important ....
@@ -99,7 +139,7 @@ export const productSlice = createSlice({
       })
       .addCase(fetchProductListAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        console.log("Over here" , action.payload);
+        console.log("Over here", action.payload);
         state.products = action.payload.data;
         state.totalItems = action.payload.data.length;
         state.page = 1;
@@ -111,7 +151,7 @@ export const productSlice = createSlice({
         state.products = [];
       })
       // ====================
-      
+
       // Fetch Particular Product ......
       .addCase(fetchProductDetailAsync.pending, (state) => {
         state.currentProduct = null;
@@ -136,7 +176,7 @@ export const productSlice = createSlice({
         // console.log("Action Fufilled payload", action);
         state.status = "idle";
         // console.log("am i here " , action.payload.data);
-        state.products =action.payload.data;
+        state.products = action.payload.data;
         state.totalItems = action.payload.totalItems;
       })
       .addCase(fetchProductByFiltersAsync.rejected, (state) => {
@@ -155,6 +195,33 @@ export const productSlice = createSlice({
       .addCase(fetchProductsFiltersAsync.rejected, (state) => {
         state.status = "failed";
         state.filters = [];
+      })
+      .addCase(addProductAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addProductAsync.fulfilled, (state, action) => {
+        // console.log("Action Fufilled payload", action);
+        state.status = "idle";
+        state.products.push(action.payload.data);
+        console.log(action.payload, "data is added");
+      })
+      .addCase(addProductAsync.rejected, (state) => {
+        state.status = "failed";
+      })
+      .addCase(editProductAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(editProductAsync.fulfilled, (state, action) => {
+        const data = action.payload.data;
+        const filterdData = state.products.filter( (product) => product.id !== data.id );
+        console.log(data, " ", filterdData);
+        // if( findIndex ){
+          state.products = [...filterdData,data];
+        // }
+        state.status = "idle";
+      })
+      .addCase(editProductAsync.rejected, (state) => {
+        state.status = "failed";
       });
   },
   get extraReducers() {
@@ -165,12 +232,14 @@ export const productSlice = createSlice({
   },
 });
 
-export const { incrementPage, decrementPage, setPage ,clearProducts } = productSlice.actions;
+export const { incrementPage, decrementPage, setPage ,clearProducts ,clearSelectedProduct ,setFilterQuery,setSortQuery } = productSlice.actions;
 export {
   fetchProductListAsync,
   fetchProductDetailAsync,
   fetchProductByFiltersAsync,
   fetchProductsFiltersAsync,
+  addProductAsync,
+  editProductAsync,
 };
 
 export default productSlice.reducer;

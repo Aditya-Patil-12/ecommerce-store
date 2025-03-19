@@ -6,7 +6,7 @@ import { fetchProductDetailAsync } from "../productListSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { addToCartAsync } from "../../cart/CartSlice";
-
+import { toast, ToastContainer } from "react-toastify";
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
   { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
@@ -58,6 +58,7 @@ export default function ProductDetails() {
       return ;
     }
     await dispatch(addToCartAsync({userId:userId,quantity:quantity,color:selectedColor,size:selectedSize,...product}));
+    toast.success("Product Added");
     // console.log("After Adding moving to cart");
     await setShopped(true);
   };
@@ -73,6 +74,7 @@ export default function ProductDetails() {
     return <Navigate to="/cart" replace />;
   }
   return (
+    <>
     <div className="bg-white">
       <div className="pt-6">
         <nav aria-label="Breadcrumb">
@@ -333,6 +335,7 @@ export default function ProductDetails() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

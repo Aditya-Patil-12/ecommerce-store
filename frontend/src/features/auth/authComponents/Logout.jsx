@@ -28,7 +28,7 @@ const Logout = () => {
   return (
     <>
       {!user && <Navigate to="/login" replace />}
-      <h1>Logging Out {user.userName}</h1>
+      <h1>Logging Out {user?.userName}</h1>
     </>
   );
 };

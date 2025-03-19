@@ -4,22 +4,34 @@ import { MdDelete } from "react-icons/md";
 import { Link,Navigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { updateCartItemAsync,deleteCartItemAsync } from "./CartSlice";
-
+import { toast } from 'react-toastify'
+import ModalContainer from "../../commonComponents/ModalPage";
+import RemoveProductNotification from "./cartComponents/RemoveProductNotification";
+import { ThreeDots } from 'react-loader-spinner' 
 export default function Cart() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const totalItems = useSelector((state) => state.cart.totalItems);
   const amount = useSelector((state) => state.cart.amount);
   const isCartFetched = useSelector((state)=>state.cart.status);
   const products = useSelector((state)=>state.cart.cart);
   // console.log("*(*(*(*(*(*H",isCartFetched,"  ",products);
-  
-  const handleRemove = async (item)=>{
-    await dispatch(deleteCartItemAsync({ 
+  const removeProductDispatcher = async (item) =>{
+    console.log(item);
+    await dispatch(deleteCartItemAsync({
       id:(item.id) ,
       updateByAmount: -((+item.quantity)*(+item.price)) ,
-      updateByItem:(-(+item.quantity)) 
+      updateByItem:(-(+item.quantity))
     }));
+    toast.success(`${item?.title} Deleted Succesfully`);
+  }
+  const handleRemove = async (item)=>{
+    setOpen(item);
+    // await dispatch(deleteCartItemAsync({ 
+    //   id:(item.id) ,
+    //   updateByAmount: -((+item.quantity)*(+item.price)) ,
+    //   updateByItem:(-(+item.quantity)) 
+    // }));
   }
   const handleChange = async (value, item) => {
     // + means this for integer
@@ -45,11 +57,31 @@ export default function Cart() {
     return <Navigate to="/products"  />;
   }
   if( isCartFetched === "loading" ){
-    return <h1>Loading ...</h1>
+    return (<ThreeDots
+  visible={true}
+  height="80"
+  width="80"
+  color="#4fa94d"
+  radius="9"
+  ariaLabel="three-dots-loading"
+  wrapperStyle={{}}
+  wrapperClass=""
+  />)
   }
+  console.log(open);
   // console.log(generateOptions(12));
   return (
     <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+      <ModalContainer
+        setOpen={setOpen}
+        open={open}
+        actionName={"Delete Product"}
+        actionType={"Delete"}
+        actionMethod={removeProductDispatcher}
+        payload={open}
+      >
+        <RemoveProductNotification itemTitle={open?.title} />
+      </ModalContainer>
       <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 ">
         <div className="flex items-start justify-between">
           <h1 className="text-lg font-medium text-gray-900">Shopping cart</h1>
@@ -92,11 +124,9 @@ export default function Cart() {
                           }
                           className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
                         >
-                                    {
-                                      (product.quantity === 1) ? (<MdDelete/>) :(<FaMinus />)
-                                    }
+                          {product.quantity === 1 ? <MdDelete /> : <FaMinus />}
                         </button>
-                        <p >{product.quantity}</p>
+                        <p>{product.quantity}</p>
                         <button
                           type="button"
                           onClick={() =>
