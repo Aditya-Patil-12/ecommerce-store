@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ProductsComponent from "./ProductsComponent";
 import ProductPagination from "./ProductPagination";
-
+import Pagination from "../../../commonComponents/Pagination";
 import {
-  fetchProductListAsync,
   fetchProductByFiltersAsync,
   fetchProductsFiltersAsync,
-  setPage
+  setPage,
+  incrementPage,
+  decrementPage,
 } from "../productListSlice";
 import {
   Dialog,
@@ -52,13 +53,10 @@ export default function ProductList() {
   const dispatch = useDispatch();
   const totalItems = useSelector((state) => state.product.totalItems);
 
-  console.log(status);
   
   useEffect(() => {
-    
     const fetchData = async () => {
       // console.log("******************Fetching for Products");
-      
       await dispatch(fetchProductByFiltersAsync({filterQuery, sortQuery,page}));
     };
     fetchData();
@@ -73,38 +71,36 @@ export default function ProductList() {
   }, [dispatch]);
 
   useEffect(()=>{
-    // console.log("check for page())()()()()(",page);
-    // const change= async ()=.
     if( page != 1 ) dispatch(setPage(1));
   },[filterQuery,sortQuery]);
 
-const handleFilters = ({ filterType, value ,checked }) => {
-  // console.log(filterType, " ", value);
-  
-    const newFilters = JSON.parse(JSON.stringify({ ...filterQuery }));
+  const handleFilters = ({ filterType, value ,checked }) => {
+    // console.log(filterType, " ", value);
+    
+      const newFilters = JSON.parse(JSON.stringify({ ...filterQuery }));
 
-  if( checked ){
-    if(newFilters[`${filterType}`] ){
-      newFilters[`${filterType}`].push(value);
+    if( checked ){
+      if(newFilters[`${filterType}`] ){
+        newFilters[`${filterType}`].push(value);
+      }
+      else{
+        newFilters[`${filterType}`]=[value];
+      }
+      // console.log(newFilters);
+      dispatch(setFilterQuery(newFilters));
+      // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
     }
     else{
-      newFilters[`${filterType}`]=[value];
+      // for object deletion .....
+      // delete newFilters[`${filterType}`];
+      let index = newFilters[`${filterType}`].findIndex((reqValue)=> reqValue === value);
+      newFilters[`${filterType}`].splice(index,1);
+      // console.log("*&%& IOverHere",newFilters);
+      dispatch(setFilterQuery(newFilters));
+      // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
     }
-    // console.log(newFilters);
-    dispatch(setFilterQuery(newFilters));
-    // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
-  }
-  else{
-    // for object deletion .....
-    // delete newFilters[`${filterType}`];
-    let index = newFilters[`${filterType}`].findIndex((reqValue)=> reqValue === value);
-    newFilters[`${filterType}`].splice(index,1);
-    // console.log("*&%& IOverHere",newFilters);
-    dispatch(setFilterQuery(newFilters));
-    // dispatch(fetchProductByFiltersAsync(newFilters, sortQuery));
-  }
-  return;
-};
+    return;
+  };
   return (
     <div className="bg-white">
       <div>
@@ -122,6 +118,7 @@ const handleFilters = ({ filterType, value ,checked }) => {
           filters={filters}
           handleFilters={handleFilters}
           setMobileFiltersOpen={setMobileFiltersOpen}
+          filterQuery={filterQuery}
           page={page}
         />
       </div>
@@ -129,19 +126,38 @@ const handleFilters = ({ filterType, value ,checked }) => {
   );
 }
 
-function Filters({ filters, handleFilters }) {
+function Filters({ filters, handleFilters,filterQuery }) {
   // console.log(filters);
 
   if( !filters ){
-    return <h1>Check for this</h1>;
+    return <h1>Filters Loading.....</h1>;
   }
-  // console.log(filters[0].options.map((value)=>(value["label"]))," asdfjasf");
-  // console.log("printing filter :",category, ' ',brand);
+  const checkIfAlreadyChecked = ({filterType,filterValue})=>{
+    
+    filterType=filterType.toLowerCase();
+    let filterValues = filterQuery[`${filterType}`];
+    // console.log("Checking for checked values", filterType, " ", filterValue);
+    // console.log(filterValues);
 
+    
+    let index = -1;
+    if( filterValues ){
+      index = filterValues.findIndex((value) => value === filterValue);
+    }
+    else{
+      index = -1;
+    }
+    // console.log(filterType," ",filterValue," ",index);
+    if( index === -1 ) return false;
+    return true;
+  }
+// console.log(checkIfAlreadyChecked({filterType:"category",filterValue:"beauty"}));
+  console.log("Filter relaoding");
+  
   return (
     <form className="hidden lg:block" key={`DesktopComponentFilters`}>
       <h3 className="sr-only">Categories</h3>
-
+      {/* Filters ==> Categories and Brand */}
       {filters.map((section) => (
         <Disclosure
           key={section.id}
@@ -165,60 +181,67 @@ function Filters({ filters, handleFilters }) {
           </h3>
           <DisclosurePanel className="pt-6">
             <div className="space-y-4">
-              {section.options.map((option, optionIdx) => (
-                <div key={option.value} className="flex gap-3">
-                  <div className="flex h-5 shrink-0 items-center">
-                    <div className="group grid size-4 grid-cols-1">
-                      <input
-                        defaultValue={option.value}
-                        // defaultChecked={option["checked"]}
-                        id={`filter-${section.id}-${optionIdx}`}
-                        name={`${section.id}[]`}
-                          onChange={(e) =>{
-                              // console.log(e.target.checked ,"  ",{
-                              //   filterType: section.id,
-                              //   value: e.target.value,
-                              // });
-                              handleFilters({
-                                filterType: section.id,
-                                value: e.target.value,
-                                checked:e.target.checked,
-                              });
-                          }
-                        }
-                        type="checkbox"
-                        className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                      />
-                      <svg
-                        fill="none"
-                        viewBox="0 0 14 14"
-                        className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                      >
-                        <path
-                          d="M3 8L6 11L11 3.5"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-checked:opacity-100"
-                        />
-                        <path
-                          d="M3 7H11"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="opacity-0 group-has-indeterminate:opacity-100"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <label
-                    htmlFor={`filter-${section.id}-${optionIdx}`}
-                    className="text-sm text-gray-600 border-8"
-                  >
-                    {option.label}
-                  </label>
-                </div>
-              ))}
+              {section.options.map((option, optionIdx) => { 
+                const isChecked = checkIfAlreadyChecked({
+                             filterType: section.name,
+                             filterValue: option.value,
+                           });
+               return (
+                 <div key={option.value} className="flex gap-3">
+                   <div className="flex h-5 shrink-0 items-center">
+                     <div className="group grid size-4 grid-cols-1">
+                       <input
+                         type="checkbox"
+                         id={`filter-${section.id}-${optionIdx}`}
+                         name={`${section.id}[]`}
+                         // value={option.value}
+                         defaultChecked={isChecked}
+                         onChange={(e) => {
+                           // console.log(e.target.checked ,"  ",{
+                           //   filterType: section.id,
+                           //   value: e.target.value,
+                           // });
+                           console.log("inside");
+
+                           handleFilters({
+                             filterType: section.id,
+                             value: option.value,
+                             checked: e.target.checked,
+                           });
+                         }}
+                         className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
+                       />
+                       <svg
+                         fill="none"
+                         viewBox="0 0 14 14"
+                         className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
+                       >
+                         <path
+                           d="M3 8L6 11L11 3.5"
+                           strokeWidth={2}
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           className="opacity-0 group-has-checked:opacity-100"
+                         />
+                         <path
+                           d="M3 7H11"
+                           strokeWidth={2}
+                           strokeLinecap="round"
+                           strokeLinejoin="round"
+                           className="opacity-0 group-has-indeterminate:opacity-100"
+                         />
+                       </svg>
+                     </div>
+                   </div>
+                   <label
+                     htmlFor={`filter-${section.id}-${optionIdx}`}
+                     className="text-sm text-gray-600"
+                   >
+                     {option.label}
+                   </label>
+                 </div>
+               );
+              })}
             </div>
           </DisclosurePanel>
         </Disclosure>
@@ -233,13 +256,11 @@ function MobileComponent({
   setMobileFiltersOpen,
   handleFilters,
 }) {
-  // console.log("in mobile comp", filters);
 
-  // console.log(mobileFiltersOpen);
   if (!filters) {
     return <>Loading...</>;
   }
-  // console.log(filters);
+  console.log(filters);
 
   return (
     <div>
@@ -317,6 +338,7 @@ function MobileComponent({
                                 }
                                 className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                               />
+                              
                               <svg
                                 fill="none"
                                 viewBox="0 0 14 14"
@@ -364,14 +386,14 @@ function DesktopComponent({
   filters,
   setMobileFiltersOpen,
   handleFilters,
-  page
+  page,
+  filterQuery
 }) {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.product.status);
   const handleSort = (e, options) => {
     let value = options.sort;
     if (options.order === "desc") value= "-" + value;
-    // console.log(options);
     dispatch(setSortQuery({ filterType: "_sort", value: value }));
   };
   return (
@@ -418,13 +440,14 @@ function DesktopComponent({
             </MenuItems>
           </Menu>
 
-          <button
+          {/* <button
             type="button"
             className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7"
           >
             <span className="sr-only">View grid</span>
             <Squares2X2Icon aria-hidden="true" className="size-5" />
-          </button>
+          </button> */}
+
           <button
             type="button"
             onClick={() => setMobileFiltersOpen(true)}
@@ -445,29 +468,33 @@ function DesktopComponent({
         <div className="grid grid-cols-1 gap-x-0 gap-y-10 lg:grid-cols-6">
           {/* Filters ===================== */}
           {/* <div className="border-8"> */}
-          <Filters filters={filters} handleFilters={handleFilters} />
+          <Filters
+            filters={filters}
+            handleFilters={handleFilters}
+            filterQuery={filterQuery}
+          />
           {/* </div> */}
           {/* Filters end ============ */}
 
           {/* Product grid */}
           <div className="lg:col-span-5">
-            {
-              status === "loading" ?(
-                <div className="flex justify-center">
-                  <ThreeDots
-                    visible={true}
-                    height="80"
-                    width="80"
-                    color="#4fa94d"
-                    radius="9"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                    className=""
-                  />
-                </div>
-              ):(<ProductsComponent products={products} />)
-            }
+            {status === "loading" ? (
+              <div className="flex justify-center">
+                <ThreeDots
+                  visible={true}
+                  height="80"
+                  width="80"
+                  color="#4fa94d"
+                  radius="9"
+                  ariaLabel="three-dots-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                  className=""
+                />
+              </div>
+            ) : (
+              <ProductsComponent products={products} />
+            )}
           </div>
         </div>
       </section>
@@ -476,7 +503,7 @@ function DesktopComponent({
 
       {/* Section of Pagination */}
       <div className="ok">
-        <ProductPagination totalItems={totalItems} page={page} />
+        <Pagination totalItems={totalItems} page={page} incrementPage={incrementPage} decrementPage={decrementPage} setPage={setPage} />
       </div>
     </main>
   );

@@ -14,12 +14,11 @@ const AdminProductComponent = ({ products }) => {
   const dispatch = useDispatch();
 
   const deleteProductDispatcher = async (product) => { 
-    const { deleted } = product;
-    if (deleted) {
-      await dispatch(editProductAsync({ ...product, deleted: false }));
-    } else{
-      
-      await dispatch(editProductAsync({ ...product, deleted: true }));
+    const { featured } = product;
+    if (featured) {
+      await dispatch(editProductAsync({ id: product.id, featured: false }));
+    } else {
+      await dispatch(editProductAsync({ id: product.id, featured: true }));
     }
     toast.success(`${product?.title} Deleted Succesfully`);
   };

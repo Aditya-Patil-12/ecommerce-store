@@ -1,56 +1,36 @@
-import { default as axios } from "axios";
+import axios from "../../app/axiosConfig";
+const cartServerURL = "/cart";
 
-const addToCart = async (itemDetails) => {
-  console.log("finally id changed",itemDetails);
-  let resp;
-  try {
-     resp = await axios.post(
-      // "http://localhost:5000/api/v1/order/singleOrder"
-      "http://localhost:5000/cart",
-      {
-        ...itemDetails,
-      }
-    );
-    console.log("received Item to Cart to Succesfully", await resp.data);
-    return { msg: "Add to Cart Success",items:resp.data,success: true };
-  } catch (error) {
-    return { msg: "Add to Cart Failed", success: false };
-  }
-};
-
-const getItemsByUserId = async (userId) => {
+const getCartItemsByUserId = async (userId) => {
   // *** User.id should be a string ...
-  let items = null;
-  console.log("Yes over here");
-  
   try {
-    items = await axios.get(
-      // "http://localhost:5000/api/v1/cart?user=" + userId
-      "http://localhost:5000/cart?userId=" + userId
-    );
-    console.log("ok",items);
-    
-    console.log("received ", await items.data[0]);
-    return { msg: "Fetch Items SuccessFull", items: items.data, success: true };
+    const cart = await axios.get(cartServerURL + "/showAllMyCartItems");
+    return { userCart:cart.data ,success: true };
   } catch (error) {
-    return { msg: "Fetch User Items By Id Failed", success: false };
+    return { msg: error.response.payload.msg, success: false };
+  }
+};
+const addToCart = async (itemDetails) => {
+  console.log("finally id changed", itemDetails);
+  try {
+    const resp = await axios.post(cartServerURL, itemDetails);
+    console.log("received Item to Cart to Succesfully", resp.data);
+    return { product:resp.data, success: true };
+  } catch (error) {
+    return { msg:error.response.payload.msg, success: false };
   }
 };
 
-const updateCartItem = async (update) => {
+const updateCartItem = async (updateInfo) => {
   // TODO : update : {userId:,productId:,quantity}
   // *** Update.id should be a string ...
-  console.log("in Update Slice ", update);
+  console.log("in Update Slice ", updateInfo);
   try {
-    const resp = await axios.patch(
-      // "http://localhost:5000/api/v1/cart/" + update.id
-      "http://localhost:5000/cart/" + update.id, 
-       update,
-    );
-    // console.log("done update",resp);
-    return await { msg: "Update Carts successFull", success: true };
+    const resp = await axios.patch(cartServerURL, updateInfo);
+    console.log("done update :::::::", resp.data);
+    return { msg: "Product Updated Succesfully", success: true };
   } catch (error) {
-    return await { msg: " update Cart errror", success: false };
+    return { msg: error.response.payload.msg, success: false };
   }
 };
 
@@ -59,35 +39,26 @@ const deleteCartItem = async (deleteId) => {
   // *** Update.id should be a string ...
   console.log(deleteId);
   try {
-    const resp = await axios.delete(
-      "http://localhost:5000/cart/" + deleteId
-    );
+    await axios.delete(cartServerURL+"?id="+deleteId);
     return { msg: "Delete Cart Item successFull", success: true };
   } catch (error) {
-    return { msg: " delete Cart Item error", success: false };
+    return { msg: error.response.payload.msg, success: false };
   }
-  console.log("delete done update");
 };
 
-const deleteCompleteUserCart = async (userId) => {
+const deleteCompleteUserCart = async () => {
   // *** Update.id should be a string ...
-  console.log(userId);
-  
   try {
-    const userCart = await getItemsByUserId(userId);
-    for( let item of await userCart.items ){
-      await deleteCartItem(item.id);
-    }
-    return { msg: "Delete Cart successFull", success: true };
+    await axios.delete(cartServerURL + "/clearMyCart");
+    return {msg:"Complete Cart Deleted Succesfully",success:true};
   } catch (error) {
     return { msg: " delete Cart error", success: false };
   }
-  console.log("delete done update");
 };
 
 export {
   addToCart,
-  getItemsByUserId,
+  getCartItemsByUserId,
   updateCartItem,
   deleteCartItem,
   deleteCompleteUserCart,

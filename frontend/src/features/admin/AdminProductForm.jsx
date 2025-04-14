@@ -4,10 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { validateInteger } from "../../utils/validateNumeric";
 import { validateReal } from "../../utils/validateNumeric";
+import { Link, useNavigate } from "react-router";
 import {
   addProductAsync,
   editProductAsync,
-  fetchProductListAsync,
   fetchProductDetailAsync,
 } from "../productList/productListSlice";
 /*
@@ -39,6 +39,7 @@ export default function AdminProductForm() {
   const sortQuery = useSelector((state) => state.product.sortQuery);
   const products = useSelector((state)=>state.product.products);
   const index = products.find((product)=> product.id === "101");
+  const navigate = useNavigate();
   console.log(index);
   
   const params = useParams();
@@ -122,18 +123,20 @@ export default function AdminProductForm() {
     
     if( params && params.id ){
       // edit update ====>
-        await dispatch(editProductAsync({...selectedProduct,...data}));     
+              data["id"] =params.id;
+        await dispatch(editProductAsync({...selectedProduct,...data}));   
+      navigate(-1);  
     } 
     else{
       // add A new Item .....
       data["id"] = (totalItems + 1).toString();    
       await dispatch(addProductAsync(data));
+      navigate(-1);
     }
 
 
     // TODO :Over here all Products are Fetched 
     // await dispatch(fetchProductByFiltersAsync());
-    // await dispatch(fetchProductListAsync());
   };
 
   return (
@@ -416,6 +419,27 @@ export default function AdminProductForm() {
               </div>
             </div>
 
+            <div className="col-span-full">
+              <label
+                htmlFor="warrantyInformation"
+                className=" block text-sm/6 font-medium text-gray-900"
+              >
+                Warranty Information*
+              </label>
+              <div className="mt-2 m-auto">
+                <textarea
+                  id="warrantyInformation"
+                  name="warrantyInformation"
+                  rows={1}
+                  // there is resize property given to adjust the typing the y direction
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 "
+                  defaultValue={
+                    selectedProduct ? selectedProduct.warrantyInformation : ""
+                  }
+                />
+              </div>
+            </div>
+
             <div className="sm:col-span-full">
               <label
                 htmlFor="thumbnail"
@@ -465,9 +489,12 @@ export default function AdminProductForm() {
         </div>
       </div>
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm/6 font-semibold text-gray-900">
+        <Link
+          to="/admin/products"
+          className="text-sm/6 font-semibold text-gray-900"
+        >
           Cancel
-        </button>
+        </Link>
         <button
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

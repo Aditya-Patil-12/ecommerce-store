@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-  productListAPI,
   singleProductAPI,
   productsByFiltersAPI,
   productsFiltersListAPI,
@@ -20,28 +19,11 @@ const initialState = {
   status: "idle",
 };
 
-const fetchProductListAsync = createAsyncThunk(
-  "product/fetchAllProducts",
-  async () => {
-    // console.log("entered here");
-    // console.log("page: ",page);
-    
-    const response = await productListAPI();
-    // console.log("*adfsas*asddfadsf*asfd***sending back",response);
-    return {
-      data:response
-    };
-  }
-);
-
 const fetchProductDetailAsync = createAsyncThunk(
   "product/fetchProductDetail",
   async (id) => {
     // console.log("Inside fetch Product Details\n");
-    const response = await singleProductAPI(id);
-    return {
-      data:response
-    };
+    return await singleProductAPI(id);
   }
 );
 
@@ -62,33 +44,20 @@ const fetchProductsFiltersAsync = createAsyncThunk(
   async () => {
     // console.log("This is need for it :", filters);
     // console.log("Inside fetch Product Details\n");
-    const response = await productsFiltersListAPI();
-    return {
-      data: response,
-    };
+    return await productsFiltersListAPI();
   }
 );
 
 const addProductAsync = createAsyncThunk(
   "product/addProductDetails",
   async (product)=>{
-    const resp = await addProductAPI(product);
-    if (resp.success) {
-      return { data: resp.data, success: true };
-    }
-    return { success: false };
+    return  await addProductAPI(product);
 })
 
 const editProductAsync = createAsyncThunk(
   "product/editProductDetails",
   async (product) => {
-    const resp = await editProductAPI(product);
-    console.log(resp);
-    
-    if (resp.success) {
-      return { data: resp.data, success: true };
-    }
-    else return { success: false };
+    return await editProductAPI(product);
   }
 );
 
@@ -133,25 +102,7 @@ export const productSlice = createSlice({
   // underscore is important ....
   _extraReducers: (builder) => {
     builder
-      // get Complete Prdocuts List //////////
-      .addCase(fetchProductListAsync.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchProductListAsync.fulfilled, (state, action) => {
-        state.status = "idle";
-        console.log("Over here", action.payload);
-        state.products = action.payload.data;
-        state.totalItems = action.payload.data.length;
-        state.page = 1;
-      })
-      .addCase(fetchProductListAsync.rejected, (state) => {
-        state.status = "failed";
-        state.totalItems = 0;
-        state.page = 1;
-        state.products = [];
-      })
       // ====================
-
       // Fetch Particular Product ......
       .addCase(fetchProductDetailAsync.pending, (state) => {
         state.currentProduct = null;
@@ -160,7 +111,10 @@ export const productSlice = createSlice({
       .addCase(fetchProductDetailAsync.fulfilled, (state, action) => {
         // console.log("Action Fufilled payload", action);
         state.status = "idle";
-        state.currentProduct = action.payload.data[0];
+        const {success} = action.payload;
+        if( success ){
+          state.currentProduct = action.payload.product;
+        }
       })
       .addCase(fetchProductDetailAsync.rejected, (state) => {
         state.status = "failed";
@@ -175,8 +129,8 @@ export const productSlice = createSlice({
       .addCase(fetchProductByFiltersAsync.fulfilled, (state, action) => {
         // console.log("Action Fufilled payload", action);
         state.status = "idle";
-        // console.log("am i here " , action.payload.data);
-        state.products = action.payload.data;
+        console.log("am i here " , action.payload.data);
+        state.products = action.payload.products;
         state.totalItems = action.payload.totalItems;
       })
       .addCase(fetchProductByFiltersAsync.rejected, (state) => {
@@ -188,9 +142,9 @@ export const productSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProductsFiltersAsync.fulfilled, (state, action) => {
-        // console.log("Action Fufilled payload", action);
+        console.log("Action Fufilled payload", action.payload);
         state.status = "idle";
-        state.filters = action.payload.data;
+        state.filters = action.payload.filters;
       })
       .addCase(fetchProductsFiltersAsync.rejected, (state) => {
         state.status = "failed";
@@ -202,7 +156,8 @@ export const productSlice = createSlice({
       .addCase(addProductAsync.fulfilled, (state, action) => {
         // console.log("Action Fufilled payload", action);
         state.status = "idle";
-        state.products.push(action.payload.data);
+        // remember to fetch the product list again bro 
+        // state.products.push(action.payload.data);
         console.log(action.payload, "data is added");
       })
       .addCase(addProductAsync.rejected, (state) => {
@@ -212,12 +167,15 @@ export const productSlice = createSlice({
         state.status = "loading";
       })
       .addCase(editProductAsync.fulfilled, (state, action) => {
-        const data = action.payload.data;
-        const filterdData = state.products.filter( (product) => product.id !== data.id );
-        console.log(data, " ", filterdData);
-        // if( findIndex ){
-          state.products = [...filterdData,data];
-        // }
+        const {success} = action.payload;
+        if( success ){
+          const data = action.payload.product.product;
+          const index = state.products.findIndex( (product) => product.id === data.id );
+          console.log(data, " ", index);
+          if (index != -1)  {
+            state.products[index] = data;
+          }
+        }
         state.status = "idle";
       })
       .addCase(editProductAsync.rejected, (state) => {
@@ -234,7 +192,6 @@ export const productSlice = createSlice({
 
 export const { incrementPage, decrementPage, setPage ,clearProducts ,clearSelectedProduct ,setFilterQuery,setSortQuery } = productSlice.actions;
 export {
-  fetchProductListAsync,
   fetchProductDetailAsync,
   fetchProductByFiltersAsync,
   fetchProductsFiltersAsync,

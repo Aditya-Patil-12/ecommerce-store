@@ -4,46 +4,71 @@ import { useDispatch } from "react-redux";
 import { createUserAsync } from "../AuthSlice";
 import verifyRegisterDetails from "../../../utils/checkRegisterDetails";
 import PasswordGuideLines from "./PasswordGuideLines";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router";
 import { ToastContainer,toast } from "react-toastify";
 export default function SignUp() {
-  const [isGuidelinesOpen, setIsGuidlinesOpen] = useState(false);
-  const [isRegistered,setIsRegistered] =useState(false);
   const dispatch = useDispatch();
+  const navigate  = useNavigate();
+  const [isGuidelinesOpen, setIsGuidlinesOpen] = useState(false);
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
-    console.log(data);
-    
-    const verify = verifyRegisterDetails(data);
-    console.log(verify);
-    if (verify.success) {
-      // e.currentTarget.reset();
-      const registerUser = async () => {
-        await dispatch(
-          createUserAsync({ ...data, addresses: [], role: "customer" })
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const btn = e.target.querySelector("#registerBtn");
+      btn.disabled = true;
+      const formData = new FormData(e.currentTarget);
+      const data = Object.fromEntries(formData);
+
+      const validateEntries = verifyRegisterDetails(data);
+
+      let toastMessage = validateEntries.success ? "" : validateEntries.msg,
+        isWarning = true;
+
+      if (validateEntries.success) {
+        const { userName: name, email, password } = data;
+        const { payload: registered } = await dispatch(
+          createUserAsync({ name, email, password })
         );
-        setIsRegistered(true);
-      };
-      registerUser();
-    }
-    else{
-      toast.info(verify.msg);
-    }
+        // console.log("just check ", registered);
+
+        if (registered.success) {
+          toastMessage = "Registration Successfull";
+        } else {
+          toastMessage = registered.msg;
+          isWarning = false;
+        }
+      }
+      if (toastMessage == "Registration Successfull") {
+        // console.log("Starting to make ");
+
+        toast.success(toastMessage, {
+          position: "top-right",
+          autoClose: 3000,
+          closeOnClick: false,
+          pauseOnHover: false,
+          onClose: () => navigate("/login", { replace: true }),
+        });
+      } else if (!isWarning) {
+        btn.disabled = false;
+        console.log(toastMessage);
+        toast.error(toastMessage);
+        e.target.reset();
+      } else {
+        btn.disabled = false;
+        toast.warning(toastMessage);
+      }
+    } catch (error) { console.log("over here ", error);
+      }
   };
   return (
     <>
     <ToastContainer/>
-      {isRegistered && <Navigate to="/login" replace={true} />}
-
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             alt="Your Company"
-            src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+            src="/Logo.png"
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
@@ -146,10 +171,11 @@ export default function SignUp() {
             </div>
 
 
-            <div>
+            <div id="formBtn">
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                id="registerBtn"
               >
                 Sign in
               </button>

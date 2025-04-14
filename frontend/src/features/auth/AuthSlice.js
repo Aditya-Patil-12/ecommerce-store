@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
 const initialState = {
   userId: null,
   userEmail:null,
@@ -16,17 +15,7 @@ const createUserAsync = createAsyncThunk(
   "auth/createUserDetails",
   async (info) => {
     console.log("fetchUserDetailAsync :", info);
-    const response = await createUser(info);
-    if (!response.success) {
-      // TODO : go for Register
-      return { success: false };
-    }
-    console.log("in here register :", response);
-    return {
-      userEmail: response.data.email,
-      userId: response.data.id,
-      success:true,
-    };
+    return await createUser(info);
   }
 );
 
@@ -34,16 +23,7 @@ const checkUserAsync = createAsyncThunk(
   "auth/checkUserDetail",
   async (info) => {
     console.log("checkUserAsync :", info);
-    const response = await checkUser(info);
-    console.log("checkuserAysnc Response", response);
-    if (!response.success) {
-      return { msg: "Failed",success:false };
-    }
-    return {
-      userEmail: response.data.email,
-      userId: response.data.id,
-      success:true
-    };
+    return  await checkUser(info);
   }
 );
 
@@ -71,16 +51,15 @@ export const authSlice = createSlice({
       .addCase(createUserAsync.fulfilled, (state, action) => {
         console.log(action.payload);
         const { success } = action.payload;
-        if (success){
-          state.userEmail = action.payload.userEmail;
-          state.userId = action.payload.userId;
-          state.status = "idle";
-        } 
+        // if (success){
+        //   // state.isLogin
+        // } 
+        state.status = "idle";
       })
       .addCase(createUserAsync.rejected, (state) => {
         state.status = "rejected";
-        state.userEmail = null;
-        state.userId = null;
+        // state.userEmail = null;
+        // state.userId = null;
       })
       .addCase(checkUserAsync.pending, (state) => {
         state.status = "loading";
@@ -89,15 +68,16 @@ export const authSlice = createSlice({
         console.log(action.payload);
         const { success } = action.payload;
         if (success) {
-          state.userEmail = action.payload.userEmail;
-          state.userId = action.payload.userId;
-          state.status = "idle";
-        } 
+          state.userEmail = action.payload.user.email;
+          state.userId = action.payload.user.id;
+        }
+        state.status = "idle";
       })
       .addCase(checkUserAsync.rejected, (state) => {
         state.status = "rejected";
-        state.userEmail = null;
-        state.userId = null;
+        // we willl check for use 
+        // state.userEmail = null;
+        // state.userId = null;
       });
   },
 });

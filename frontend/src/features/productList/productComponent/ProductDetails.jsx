@@ -6,7 +6,7 @@ import { fetchProductDetailAsync } from "../productListSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { addToCartAsync } from "../../cart/CartSlice";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
   { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
@@ -57,12 +57,13 @@ export default function ProductDetails() {
     if( quantity == 0 ){
       return ;
     }
-    await dispatch(addToCartAsync({userId:userId,quantity:quantity,color:selectedColor,size:selectedSize,...product}));
+    await dispatch(addToCartAsync(
+      {quantity:(+quantity),color:"Red",size:selectedSize.name,product:product.id}));
     toast.success("Product Added");
     // console.log("After Adding moving to cart");
     await setShopped(true);
   };
-  // console.log(product);
+  console.log(product);
   
   if ( status === "loading" ) {
     return <>Loading....</>;
@@ -162,7 +163,7 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="mt-10 border-8">
+            <form onSubmit={handleSubmit} className="mt-10 ">
               {/* Colors */}
               <div>
                 <h3 className="text-sm font-medium text-gray-900">Color</h3>
@@ -198,17 +199,20 @@ export default function ProductDetails() {
               </div>
 
               {/* Sizes */}
-              <div className="mt-10 ">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-900">Size</h3>
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Size guide
-                  </a>
-                </div>
 
+                {
+                  (product.category === 'mens-shirts') ? 
+                (
+                <div className="mt-10 ">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-900">Size</h3>
+                    <a
+                      href="#"
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      Size guide
+                    </a>
+                  </div>
                 <fieldset aria-label="Choose a size" className="mt-4">
                   <RadioGroup
                     name="size"
@@ -260,7 +264,11 @@ export default function ProductDetails() {
                     ))}
                   </RadioGroup>
                 </fieldset>
-              </div>
+                  </div>
+
+                ) : null
+                }
+
               {/* Quantity */}
               <div className="mt-10">
                 <div className="flex items-center justify-between">
@@ -300,7 +308,7 @@ export default function ProductDetails() {
           </div>
 
           {/* Description and details */}
-          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16 border-8">
+          <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16 ">
             <div>
               <h3 className="sr-only">Description</h3>
 

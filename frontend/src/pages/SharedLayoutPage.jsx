@@ -6,7 +6,7 @@ const SharedLayoutPage = () => {
   return (
     <>
       <Navbar>
-        <ToastContainer/>
+        <ToastContainer />
         <Outlet></Outlet>
       </Navbar>
     </>

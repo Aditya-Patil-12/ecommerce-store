@@ -27,21 +27,25 @@ import Demo from "./pages/Demo";
 import Protected from "./features/auth/authComponents/Protected";
 import ProtectedAdmin from "./features/auth/authComponents/ProtectedAdmin";
 import { fetchUserItemsAsync } from "./features/cart/CartSlice";
+import { loggedInUserOrdersAsync } from "./features/user/UserSlice";
 import { loggedInUserInfoAsync } from "./features/user/UserSlice";
-
+import { fetchAllCurrentUserOrdersAsync } from "./features/order/OrderSlice";
 // auth will just verify password and user give back user ID
+
 function App() {
   const userId = useSelector((state) => state.auth.userId);
-  const isLogin = useSelector((state)=>state.auth.isLogin);
+  console.log(userId);
   const dispatch = useDispatch();
   console.log("in the app");
   useEffect(() => {
     console.log("ok over here");
-    if( userId && isLogin ){
+    if( userId ){
       const fetchOrdersAndInfo = async () => {
         console.log("here is the correct User Id",userId);
         await dispatch(loggedInUserInfoAsync(userId));
-        await dispatch(fetchUserItemsAsync(userId));
+        await dispatch(loggedInUserOrdersAsync());
+        await dispatch(fetchUserItemsAsync());
+        await dispatch(fetchAllCurrentUserOrdersAsync());
       }
       fetchOrdersAndInfo();
     }
@@ -49,16 +53,34 @@ function App() {
   console.log("Going to Routes")
   return (
     // rootUrl of the browser is fetched Over here .....
+    <>
+    {/* <ToastContainer/> */}
     <BrowserRouter>
       <Routes>
         {/* these are the login Sign Up Pages ...... */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route
+          path="/login"
+          element={
+            <>
+              <LoginPage />
+            </>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <>
+              <SignUpPage />
+            </>
+          }
+        />
         <Route
           path="/logout"
           element={
             // <Protected>
+            <>
               <LogoutPage />
+            </>
             // </Protected>
           }
         />
@@ -206,9 +228,10 @@ function App() {
           />
         </Route>
         {/* ========================== */}
-        <Route path="/demo" element = {<Demo/>}/>
+        <Route path="/demo" element={<Demo />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 

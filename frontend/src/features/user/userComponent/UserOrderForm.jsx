@@ -75,7 +75,9 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                       name="fullName"
                       type="text"
                       defaultValue={
-                        (isAddressModalOpen == "add") ? "" : editingAddress.fullName
+                        isAddressModalOpen == "add"
+                          ? ""
+                          : editingAddress.fullName
                       }
                       // autoComplete ===>
                       autoComplete="name"
@@ -119,7 +121,9 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                       type="tel"
                       autoComplete="tel"
                       defaultValue={
-                        isAddressModalOpen == "add" ? "" : editingAddress.phoneNo
+                        isAddressModalOpen == "add"
+                          ? ""
+                          : editingAddress.phoneNo
                       }
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                     />
@@ -139,7 +143,9 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                       name="country"
                       autoComplete="country-name"
                       defaultValue={
-                        isAddressModalOpen == "add" ? "India" : editingAddress.country
+                        isAddressModalOpen == "add"
+                          ? "India"
+                          : editingAddress.country
                       }
                       className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                     >
@@ -165,13 +171,13 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                   <div className="mt-2">
                     <input
                       id="street-address"
-                      name="street-address"
+                      name="streetAddress"
                       type="text"
                       autoComplete="street-address"
                       defaultValue={
                         isAddressModalOpen == "add"
                           ? "India"
-                          : editingAddress["street-address"]
+                          : editingAddress["streetAddress"]
                       }
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                     />
@@ -214,7 +220,9 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                       name="city"
                       type="text"
                       defaultValue={
-                        isAddressModalOpen == "add" ? "India" : editingAddress["city"]
+                        isAddressModalOpen == "add"
+                          ? "India"
+                          : editingAddress["city"]
                       }
                       autoComplete="address-level2"
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -232,12 +240,12 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
                   <div className="mt-2">
                     <input
                       id="postal-code"
-                      name="postal-code"
+                      name="postalCode"
                       type="text"
                       defaultValue={
                         isAddressModalOpen == "add"
                           ? "India"
-                          : editingAddress["postal-code"]
+                          : editingAddress["postalCode"]
                       }
                       autoComplete="postal-code"
                       className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"

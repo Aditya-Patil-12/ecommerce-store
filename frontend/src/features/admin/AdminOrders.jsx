@@ -61,208 +61,226 @@ const AdminOrders = () => {
   }
   // console.log(orders);
   return (
-    <div className="relative ">
-      {showOrder !== -1 ? (
-        <div
-          className={
-            "absolute z-10 w-1/1 h-1/1 bg-white " +
-            `${showOrder == -1 ? "hidden" : ""}`
-          }
-        >
-          <AdminOrderDetails
-            order={orders[showOrder]}
-            setShowOrder={setShowOrder}
-          />
-        </div>
-      ) : null}
-      <div className="mt-0 align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
-        {status === "loading" ? (
-          <div className="flex justify-center">
-            <ThreeDots
-              visible={true}
-              height="80"
-              width="80"
-              color="#4fa94d"
-              radius="9"
-              ariaLabel="three-dots-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-              className=""
+    <>
+    <div className="relative">
+        {showOrder !== -1 ? (
+          <div
+            className={
+              "absolute z-10 w-1/1 bg-white " +
+              `${showOrder == -1 ? "hidden" : ""}`
+            }
+          >
+            <AdminOrderDetails
+              order={orders[showOrder]}
+              setShowOrder={setShowOrder}
             />
           </div>
-        ) : (
-          <>
-          <table className="min-w-full">
-            <thead>
-              <tr>
-                {[
-                  "Order ID",
-                  "Items",
-                  "Total Amount",
-                  "Shipping Address",
-                  "Status",
-                  "Actions",
-                  // "",
-                ].map((heading, index) => (
-                  <th
-                    key={index}
-                    className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-black-300 tracking-wider"
-                  >
-                    <div className="flex gap-2">
-                      <p
-                        className={"inline cursor-pointer"}
-                        onClick={(e) => {
-                          if (
-                            heading === "Order ID" ||
-                            heading === "Total Amount"
-                          ) {
-                            console.log("hello");
-
-                            dispatch(
-                              deleteOrderSortQuery(
-                                heading === "Order ID" ? "id" : "totalAmount"
-                              )
-                            );
-                          }
-                        }}
-                      >
-                        {heading}
-                      </p>
-                      {heading === "Total Amount" || heading === "Order ID" ? (
-                        <div className="inline">
-                          <IoMdArrowDropup
-                            className="cursor-pointer hover:border-2"
-                            onClick={() => {
-                              console.log(orderSortQuery);
-                              dispatch(
-                                setOrderSortQuery({
-                                  [heading === "Order ID"
-                                    ? "id"
-                                    : "totalAmount"]: "desc",
-                                })
-                              );
-                            }}
-                          />
-                          <IoMdArrowDropdown
-                            className="cursor-pointer hover:border-2"
-                            onClick={() =>
-                              dispatch(
-                                setOrderSortQuery({
-                                  [heading === "Order ID"
-                                    ? "id"
-                                    : "totalAmount"]: "asc",
-                                })
-                              )
-                            }
-                          />
-                        </div>
-                      ) : null}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white">
-              {orders &&
-                orders.map((order, index) => (
-                  <tr key={order.id}>
-                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-gray-800">
-                      #{order?.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-blue-900">
-                      {/* Items  */}
-                      <div className="flex flex-col">
-                        {order.products.map((product) => (
-                          <p className="mx-2" key={product.id}>
-                            {product.title} - #{product.quantity} - $
-                            {product.price}
-                          </p>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 pr-20 border-b border-gray-500 text-sm text-blue-900">
-                      <div className="flex justify-around ">
-                        <span>{Math.round(order.totalAmount * 100) / 100}</span>
-                        <span className="">
-                          {order.paymentMethod === "cash" ? (
-                            <BsCashCoin className="inline" />
-                          ) : (
-                            <MdPayment className="inline" />
-                          )}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-gray-900">
-                      {/* address */}
-                      <div className="flex gap-4">
-                        {<p className="font-bold">{order.address.fullName}</p>}
-                        {<p>{order.address.phoneNo}</p>}
-                      </div>
-                      <div className="flex gap-4">
-                        {<p>{order.address["street-address"]}</p>}
-                      </div>
-                      <div className="flex gap-4">
-                        {<p>{order.address.city}</p>}
-                        {<p>{order.address["postal-code"]}</p>}
-                      </div>
-                      {<p>{order.address.region}</p>}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm">
-                      {editableId === index ? (
-                        <select
-                          onChange={(e) => handleOrderStatusUpdate(e, order)}
-                          defaultValue={order.status}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="dispatched">Dispatched</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="canceled">Canceled</option>
-                        </select>
-                      ) : null}
-                      {editableId !== index ? (
-                        <span
-                          className={
-                            "relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight" +
-                            `${generateColor(order.status)}`
-                          }
-                        >
-                          <span
-                            aria-hidden
-                            className={
-                              "absolute inset-0 bg-green-200 opacity-50 rounded-full " +
-                              `${generateColor(order.status)}`
-                            }
-                          ></span>
-                          <span className={"relative text-xs"}>
-                            {order.status}
-                          </span>
-                        </span>
-                      ) : null}
-                    </td>
-                    <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-blue-900">
-                      <div className="flex justify-between ">
-                        <IoMdEye
-                          className="w-5 h-5 cursor-pointer"
-                          onClick={(e) => setShowOrder(index)}
-                        />
-                        <RiPencilFill
-                          className="w-5 h-5 cursor-pointer"
-                          onClick={(e) =>
-                            setEditableId(editableId === -1 ? index : -1)
-                          }
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-          <OrdersPagination totalItems={totalOrders} page={page} />
-          </>
-        )}
-      </div>
+        ) : null}
     </div>
+    {
+      showOrder == -1 ? 
+      (<div className="relative ">
+        <div className="mt-0 align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+          {status === "loading" ? (
+            <div className="flex justify-center">
+              <ThreeDots
+                visible={true}
+                height="80"
+                width="80"
+                color="#4fa94d"
+                radius="9"
+                ariaLabel="three-dots-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+                className=""
+              />
+            </div>
+          ) : (
+            <>
+              <table className="min-w-full">
+                <thead>
+                  <tr>
+                    {[
+                      "Order ID",
+                      "Items",
+                      "Total Amount",
+                      "Shipping Address",
+                      "Status",
+                      "Actions",
+                      // "",
+                    ].map((heading, index) => (
+                      <th
+                        key={index}
+                        className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-black-300 tracking-wider"
+                      >
+                        <div className="flex gap-2">
+                          <p
+                            className={"inline cursor-pointer"}
+                            onClick={(e) => {
+                              if (
+                                heading === "Order ID" ||
+                                heading === "Total Amount"
+                              ) {
+                                console.log("hello");
+
+                                dispatch(
+                                  deleteOrderSortQuery(
+                                    heading === "Order ID"
+                                      ? "id"
+                                      : "totalAmount"
+                                  )
+                                );
+                              }
+                            }}
+                          >
+                            {heading}
+                          </p>
+                          {heading === "Total Amount" ||
+                          heading === "Order ID" ? (
+                            <div className="inline">
+                              <IoMdArrowDropup
+                                className="cursor-pointer hover:border-2"
+                                onClick={() => {
+                                  console.log(orderSortQuery);
+                                  dispatch(
+                                    setOrderSortQuery({
+                                      [heading === "Order ID"
+                                        ? "id"
+                                        : "totalAmount"]: "desc",
+                                    })
+                                  );
+                                }}
+                              />
+                              <IoMdArrowDropdown
+                                className="cursor-pointer hover:border-2"
+                                onClick={() =>
+                                  dispatch(
+                                    setOrderSortQuery({
+                                      [heading === "Order ID"
+                                        ? "id"
+                                        : "totalAmount"]: "asc",
+                                    })
+                                  )
+                                }
+                              />
+                            </div>
+                          ) : null}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white">
+                  {orders &&
+                    orders.map((order, index) => (
+                      <tr key={order.id}>
+                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-gray-800">
+                          #{order?.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-blue-900">
+                          {/* Items  */}
+                          <div className="flex flex-col">
+                            {order.products.map((product) => (
+                              <p className="mx-2" key={product.id}>
+                                {product.title} - #{product.quantity} - $
+                                {product.price}
+                              </p>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 pr-20 border-b border-gray-500 text-sm text-blue-900">
+                          <div className="flex justify-around ">
+                            <span>
+                              {Math.round(order.totalAmount * 100) / 100}
+                            </span>
+                            <span className="">
+                              {order.paymentMethod === "cash" ? (
+                                <BsCashCoin className="inline" />
+                              ) : (
+                                <MdPayment className="inline" />
+                              )}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-gray-900">
+                          {/* address */}
+                          <div className="flex gap-4">
+                            {
+                              <p className="font-bold">
+                                {order.address.fullName}
+                              </p>
+                            }
+                            {<p>{order.address.phoneNo}</p>}
+                          </div>
+                          <div className="flex gap-4">
+                            {<p>{order.address["street-address"]}</p>}
+                          </div>
+                          <div className="flex gap-4">
+                            {<p>{order.address.city}</p>}
+                            {<p>{order.address["postal-code"]}</p>}
+                          </div>
+                          {<p>{order.address.region}</p>}
+                        </td>
+
+                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm">
+                          {editableId === index ? (
+                            <select
+                              onChange={(e) =>
+                                handleOrderStatusUpdate(e, order)
+                              }
+                              defaultValue={order.status}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="dispatched">Dispatched</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="canceled">Canceled</option>
+                            </select>
+                          ) : null}
+                          {editableId !== index ? (
+                            <span
+                              className={
+                                "relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight" +
+                                `${generateColor(order.status)}`
+                              }
+                            >
+                              <span
+                                aria-hidden
+                                className={
+                                  "absolute inset-0 bg-green-200 opacity-50 rounded-full " +
+                                  `${generateColor(order.status)}`
+                                }
+                              ></span>
+                              <span className={"relative text-xs"}>
+                                {order.status}
+                              </span>
+                            </span>
+                          ) : null}
+                        </td>
+                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500 text-sm text-blue-900">
+                          <div className="flex justify-between ">
+                            <IoMdEye
+                              className="w-5 h-5 cursor-pointer"
+                              onClick={(e) => setShowOrder(index)}
+                            />
+                            <RiPencilFill
+                              className="w-5 h-5 cursor-pointer"
+                              onClick={(e) =>
+                                setEditableId(editableId === -1 ? index : -1)
+                              }
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              <OrdersPagination totalItems={totalOrders} page={page} />
+            </>
+          )}
+        </div>
+      </div>):null
+    }
+    </>
   );
 };
 

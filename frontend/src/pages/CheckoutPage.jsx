@@ -4,7 +4,7 @@ import { MdDelete } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-
+import { toast } from "react-toastify";
 import { updateUserInfoAsync } from "../features/user/UserSlice";
 import {
   updateCartItemAsync,
@@ -32,37 +32,33 @@ export default function CheckOutPage() {
   // order Variables ....
   const currentOrder = useSelector((state) => state.order.currentOrder);
 
+
   // useState .......
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
 
 
 
+  // Remove Cart Product
   const handleRemove = async (item) => {
-    await dispatch(
-      deleteCartItemAsync({
-        id: item.id,
-        updateByAmount: -(+item.quantity * +item.price),
-        updateByItem: -+item.quantity,
-      })
-    );
+    await dispatch(deleteCartItemAsync({
+      id:(item.product.id) ,
+      updateByAmount: -((+item.quantity)*(+item.product.price)) ,
+      updateByItem:(-(+item.quantity))
+    }));
+    toast.success(`${item?.product.title} Deleted Succesfully`);
   };
-
+  // Incr / Decrement Product....
   const handleChange = async (value, item) => {
     // + means this for integer
     console.log("tell the updated Value", value);
-      if (value !== item.quantity){
-        if (value == 0){ 
-          await handleRemove(item);
-        }
-        else {
-          await dispatch(updateCartItemAsync({ item: item, newQuantity: value }));
-        } 
+    if (value == item.quantity) return;
+    if (value == 0) handleRemove(item);
+    else {
+      await dispatch(updateCartItemAsync({ item: item, newQuantity: value }));
     }
   };
-
-
-
+  // New Addresses is Added ..... 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Information :", e.currentTarget);
@@ -74,24 +70,41 @@ export default function CheckOutPage() {
     await dispatch(updateUserInfoAsync(
       { ...userInfo, addresses: [...userInfo.addresses,orderInfo] }));
   };
-
+  // Current Order Placement =====>
   const handleOrder = async (e) => {
     e.preventDefault();
-    if (selectedAddress && paymentMethod) {
-      // we have to place the order ....
-      await dispatch(
-        createOrderAsync({
-          userId: userId,
-          address: selectedAddress,
-          paymentMethod: paymentMethod,
-          products: products,
-          totalAmount: amount,
-          totalItems: totalItems,
-          status: "pending",
-        })
-      );
-      // TODO : redirection to order Page, stock of current product changes , clear cart items
+    if ( (!selectedAddress) || (!paymentMethod) ){
+      if (!selectedAddress) {
+        if (userInfo.addresses.length == 0) {
+          toast.info("Please Add Addresses of Order Shipping");
+        } else {
+          toast.warning("Select Shipping Addresses");
+        }
+      } else {
+        toast.warning("Select Payment Method");
+      }
+      return ;
     }
+        // we have to place the order ....
+        await dispatch(
+          createOrderAsync({
+            totalTaxAmount: 0,
+            totalShippingAmount: 0,
+            subTotal: 0,
+            total: 0,
+            user: userId,
+            paymentType: paymentMethod,
+            orderItems: products,
+            shippingAddress: selectedAddress,
+            status: "pending",
+          })
+        );
+
+        // products: products,
+        // totalAmount: amount,
+        // totalItems: totalItems,
+
+        // TODO : redirection to order Page, stock of current product changes , clear cart items
   };
   // use Navigate works now if not will use Naivgate 
   useEffect(()=>{
@@ -108,11 +121,15 @@ export default function CheckOutPage() {
 
   console.log("This is not Just Vlaue", paymentMethod);
     if (isCartFetched === "idle" && products.length === 0) {
+      toast.warning('Cart Empty, Please Buy Products');
       return <Navigate to="/products" />;
     }
     if (isCartFetched === "loading") {
       return <h1>Loading ...</h1>;
     }
+    console.log(selectedAddress);
+
+
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -221,7 +238,7 @@ export default function CheckOutPage() {
                       <div className="mt-2">
                         <input
                           id="street-address"
-                          name="street-address"
+                          name="streetAddress"
                           type="text"
                           autoComplete="street-address"
                           className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -275,7 +292,7 @@ export default function CheckOutPage() {
                       <div className="mt-2">
                         <input
                           id="postal-code"
-                          name="postal-code"
+                          name="postalCode"
                           type="text"
                           autoComplete="postal-code"
                           className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -414,69 +431,76 @@ export default function CheckOutPage() {
                 <div className="mt-8">
                   <div className="flow-root ">
                     <ul role="list" className="-my-6 divide-y divide-gray-200">
-                      {products.map((product) => (
-                        <li key={product.id} className="flex py-6">
+                      {products.map((cartProduct) => (
+                        <li key={cartProduct.product.id} className="flex py-6">
                           <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
                             <img
-                              src={product?.images[0]}
-                              alt={product.title}
+                              src={cartProduct?.product.thumbnail}
+                              alt={cartProduct.product.title}
                               className="size-full object-cover"
                             />
                           </div>
-                            <div className="ml-4 flex flex-1 flex-col">
-                              <div>
-                                <div className="flex justify-between text-base font-medium text-gray-900">
-                                  <h3>
-                                    <a href={product.href}>{product.title}</a>
-                                  </h3>
-                                  <p className="ml-4">{product.price}</p>
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500">
-                                  {product.color.name}
+                          <div className="ml-4 flex flex-1 flex-col">
+                            <div>
+                              <div className="flex justify-between text-base font-medium text-gray-900">
+                                <h3>
+                                  <a href={"#"}>{cartProduct.product.title}</a>
+                                </h3>
+                                <p className="ml-4">
+                                  {cartProduct.product.price}
                                 </p>
                               </div>
-                              <div className="flex flex-1 items-end justify-between text-sm">
-                                <div className="quantityChange w-17 flex justify-between">
-                                  <button
-                                    type="button"
-                                    onClick={(e) =>
-                                      handleChange(
-                                        product.quantity - 1,
-                                        product
-                                      )
-                                    }
-                                    className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
-                                  >
-                                        {
-                                          (product.quantity === 1) ? (<MdDelete/>) :(<FaMinus />)
-                                        }
-                                  </button>
-                                  <p >{product.quantity}</p>
-                                  <button
-                                    type="button"
-                                    onClick={(e) =>
-                                      handleChange(
-                                        Math.min(product.stock, product.quantity + 1),
-                                        product
-                                      )
-                                    }
-                                    className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
-                                  >
-                                    {" "}
-                                    <FaPlus />{" "}
-                                  </button>
-                                </div>
-                                <div className="flex">
-                                  <button
-                                    onClick={() => handleRemove(product)}
-                                    type="button"
-                                    className="font-medium text-indigo-600 hover:text-indigo-500"
-                                  >
-                                    Remove
-                                  </button>
-                                </div>
+                              <p className="mt-1 text-sm text-gray-500">
+                                {cartProduct.product.color}
+                              </p>
+                            </div>
+                            <div className="flex flex-1 items-end justify-between text-sm">
+                              <div className="quantityChange w-17 flex justify-between">
+                                <button
+                                  type="button"
+                                  onClick={(e) =>
+                                    handleChange(
+                                      Math.max(0, cartProduct.quantity - 1),
+                                      cartProduct
+                                    )
+                                  }
+                                  className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                                >
+                                  {cartProduct.quantity === 1 ? (
+                                    <MdDelete />
+                                  ) : (
+                                    <FaMinus />
+                                  )}
+                                </button>
+                                <p>{cartProduct.quantity}</p>
+                                <button
+                                  type="button"
+                                  onClick={(e) =>
+                                    handleChange(
+                                      Math.min(
+                                        cartProduct.product.stock,
+                                        cartProduct.quantity + 1
+                                      ),
+                                      cartProduct
+                                    )
+                                  }
+                                  className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                                >
+                                  {" "}
+                                  <FaPlus />{" "}
+                                </button>
+                              </div>
+                              <div className="flex">
+                                <button
+                                  onClick={() => handleRemove(cartProduct)}
+                                  type="button"
+                                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                                >
+                                  Remove
+                                </button>
                               </div>
                             </div>
+                          </div>
                         </li>
                       ))}
                     </ul>

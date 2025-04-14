@@ -7,7 +7,8 @@ const Protected = ({ children }) => {
   if (!user) {
     return <Navigate to="/login" replace={true}></Navigate>;
   }
-  if( user && user.role === "admin" ){
+  // Admin should never go to Customer Section ========>
+  if( user && (user.role) === "admin" ){
     {
       return <Navigate to="/admin" replace={true}></Navigate>;
     }

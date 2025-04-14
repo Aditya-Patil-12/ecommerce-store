@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   userOrders:[],
+  userOrdersCount:0,
   userInfo:null, 
   // this will have more informatin to be used in case of detailed user info,
   // auth will only be used for loggedInUser id 
@@ -19,16 +20,14 @@ export const loggedInUserInfoAsync = createAsyncThunk(
   "auth/loggedInUserInfoDetails",
   async (userId) => {
     console.log("userId",userId);
-    const resp = await loggedInUserInfo(userId);
-    return resp;
+    return await loggedInUserInfo(userId);
   }
 );
 
 export const loggedInUserOrdersAsync = createAsyncThunk(
   "auth/loggedInUserOrdersDetails",
   async (userId) => {
-    const resp = await loggedInUserOrders(userId);
-    return resp;
+    return await loggedInUserOrders(userId);
   }
 );
 
@@ -36,17 +35,14 @@ export const updateUserInfoAsync = createAsyncThunk(
   "auth/updateUserInfoDetails",
   async (userInfo) => {
     console.log("check Info " , userInfo);
-    const resp = await updateUserInfo(userInfo);
-    return resp;
+    return await updateUserInfo(userInfo);
   }
 );
 
 export const logoOutUserInfoAsync = createAsyncThunk(
   "auth/logoOutUserInfoDetails",
-  async (userId) => {
-    console.log("check Info ", userId);
-    const resp = await logOutUserInfo(userId);
-    return resp;
+  async () => {
+    return await logOutUserInfo();
   }
 );
 
@@ -62,28 +58,33 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    // Orders ==================> 
       .addCase(loggedInUserOrdersAsync.pending, (state) => {
         state.status = "loading";
       })
       .addCase(loggedInUserOrdersAsync.fulfilled, (state, action) => {
-        const { success, data } = action.payload;
+        const { success, orders ,items } = action.payload;
+        console.log("Here are your orders",action.payload);
         if (success) {
-          console.log("data is ", data);
-          state.userOrders = data;
+          state.userOrders = orders;
+          state.userOrdersCount = items;
         }
         state.status = "idle";
       })
+      // User Info ==============>
       .addCase(loggedInUserInfoAsync.pending, (state) => {
         state.status = "loading";
       })
       .addCase(loggedInUserInfoAsync.fulfilled, (state, action) => {
-        const { success, data } = action.payload;
+        const { success } = action.payload;
+        console.log("here is the api response",action.payload);
+        
         if (success) {
-          console.log("data is ", data);
-          state.userInfo = data;
+          state.userInfo = action.payload.user;
         }
         state.status = "idle";
       })
+      // Update User Info ==========================>
       .addCase(updateUserInfoAsync.pending, (state) => {
         state.status = "loading";
       })
@@ -95,21 +96,21 @@ export const userSlice = createSlice({
         }
         state.status = "idle";
       })
+      // Logout User Info ==========================>
       .addCase(logoOutUserInfoAsync.pending, (state) => {
         state.status = "loading";
       })
       .addCase(logoOutUserInfoAsync.fulfilled, (state, action) => {
-        const { success, data } = action.payload;
+        const { success } = action.payload;
         if (success) {
-          console.log("data is ", data);
           state.userInfo = null;
           state.userOrders = [];
         }
         state.status = "idle";
       });
+      //=============================================
   },
 });
 
 export const { clearUserInfo } = userSlice.actions;
-
 export default userSlice.reducer;

@@ -1,39 +1,55 @@
 import { useState } from "react";
-import { RiAdminFill } from "react-icons/ri";
-import { IoMdPerson } from "react-icons/io";
 import { Link, Navigate } from "react-router";
 import { useSelector,useDispatch } from "react-redux";
-
 import verifyRegisterDetails from "../../../utils/checkRegisterDetails";
 import { checkUserAsync } from "../AuthSlice";
-import { setIsLogin } from "../AuthSlice";
 import { ToastContainer, toast } from 'react-toastify';
 export default function Login() {
   const dispatch = useDispatch();
-  const [role, setRole] = useState("customer");
   const userInfo = useSelector((state) => state.user.userInfo);
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const btn = e.target.querySelector("#loginBtn");
+    btn.disabled = true;
+
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
+    let data = Object.fromEntries(formData);
     console.log(data);
-    const verify = verifyRegisterDetails({...data,login:true});
-    console.log(verify);
     
-    if( verify.success ){
-      const fetchUser = async () => {
-        await dispatch(setIsLogin(true));
-        await dispatch(checkUserAsync(data));
-        await dispatch(setIsLogin(false));
-      };
-      fetchUser(); 
+    const validateEntries = verifyRegisterDetails({...data,login:true});
+    console.log(validateEntries);
+    let toastMessage = validateEntries.success ? "" : validateEntries.msg,
+      isWarning = true,isError=true;
+
+    if (validateEntries.success) {
+      const {email, password } = data;
+      const { payload: registered } = await dispatch(
+        checkUserAsync({ email, password })
+      );
+
+      if (registered.success) {
+        toastMessage = "Credentials Successfull";
+        isWarning=false;
+        isError = false;
+      } else {
+        toastMessage = registered.msg;
+        isWarning = false;
+        isError = true;
+      }
     }
     else{
-      toast("Invalid credentials");
+      isError=false;
+    }
+    if (!isWarning && isError) {
+      btn.disabled = false;
+      toast.error(toastMessage);
+      e.target.reset();
+    } 
+    if ( isWarning && !isError) {
+      btn.disabled = false;
+      toast.warning(toastMessage);
     }
   };
-  console.log(role);
-  
   return (
     <>
     <ToastContainer/>
@@ -42,7 +58,7 @@ export default function Login() {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             alt="Your Company"
-            src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+            src="/Logo.png"
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
@@ -99,96 +115,14 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="outer">
-              <div className="flex items-center justify-between outer-role-container ">
-                {/* Role Input  */}
-                <p
-                  htmlFor="role"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Role
-                </p>
-              </div>
-              <div className="mt-2 mb-2 flex flex-row flex-wrap justify-around items-center">
-                {/* Customer ===================================== */}
-                <div
-                  onClick={() => setRole("customer")}
-                  className={`flex flex-col flex-wrap justify-center items-center box-border
-                    rounded-md h-15 w-40
-                    ${role === "customer" ? "border-indigo-600 border-5" : ""}`}
-                >
-                  <div
-                    className={`flex flex-flex-wrap justify-between items-center
-                `}
-                  >
-                    <label htmlFor="customerRole">Customer</label>
-                    <IoMdPerson
-                      className={
-                        (role === "customer" ? "text-gray-600" : "") +
-                        " w-12 h-7.5"
-                      }
-                    />
-                  </div>
-                  <input
-                    id="customerRole"
-                    name="role"
-                    type="radio"
-                    value="customer"
-                    checked={role === "customer"}
-                    onChange={(e) =>
-                      setRole((state) => {
-                        if (state !== "customer") return "customer";
-                        return state;
-                      })
-                    }
-                    // required
-                    className="hidden"
-                  />
-                </div>
-                {/* ============================================ */}
-                {/* Admin ========================== */}
-                <div
-                  onClick={(e) => setRole("admin")}
-                  className={`flex flex-col flex-wrap justify-center items-center  box-border
-                    h-15 w-40 rounded-md
-                    ${role === "admin" ? "border-5 border-indigo-600" : ""}`}
-                >
-                  <div
-                    className={`flex flex-flex-wrap justify-between items-center px-2
-                      py-2`}
-                  >
-                    <label htmlFor="adminRole">Admin</label>
-                    <RiAdminFill
-                      className={
-                        (role === "admin" ? "text-gray-600" : "") +
-                        " w-12 h-7.5"
-                      }
-                    />
-                  </div>
-                  <input
-                    id="adminRole"
-                    name="role"
-                    type="radio"
-                    value="admin"
-                    checked={role === "admin"}
-                    onChange={(e) =>
-                      setRole((state) => {
-                        if (state !== "admin") return "admin";
-                        return state;
-                      })
-                    }
-                    className="hidden"
-                  />
-                </div>
-                {/* ======================================= */}
-              </div>
-            </div>
+
 
             <div>
               <button
                 onClick={() => console.log("CLicked the submit button")}
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                id="loginBtn"
               >
                 Sign in
               </button>
@@ -209,3 +143,91 @@ export default function Login() {
     </>
   );
 }
+
+// import { RiAdminFill } from "react-icons/ri";
+// import { IoMdPerson } from "react-icons/io";
+// const [role, setRole] = useState("customer");
+            // <div className="outer">
+            //   <div className="flex items-center justify-between outer-role-container ">
+            //     {/* Role Input  */}
+            //     <p
+            //       htmlFor="role"
+            //       className="block text-sm/6 font-medium text-gray-900"
+            //     >
+            //       Role
+            //     </p>
+            //   </div>
+            //   <div className="mt-2 mb-2 flex flex-row flex-wrap justify-around items-center">
+            //     {/* Customer ===================================== */}
+            //     <div
+            //       onClick={() => setRole("customer")}
+            //       className={`flex flex-col flex-wrap justify-center items-center box-border
+            //         rounded-md h-15 w-40
+            //         ${role === "customer" ? "border-indigo-600 border-5" : ""}`}
+            //     >
+            //       <div
+            //         className={`flex flex-flex-wrap justify-between items-center
+            //     `}
+            //       >
+            //         <label htmlFor="customerRole">Customer</label>
+            //         <IoMdPerson
+            //           className={
+            //             (role === "customer" ? "text-gray-600" : "") +
+            //             " w-12 h-7.5"
+            //           }
+            //         />
+            //       </div>
+            //       <input
+            //         id="customerRole"
+            //         name="role"
+            //         type="radio"
+            //         value="customer"
+            //         checked={role === "customer"}
+            //         onChange={(e) =>
+            //           setRole((state) => {
+            //             if (state !== "customer") return "customer";
+            //             return state;
+            //           })
+            //         }
+            //         // required
+            //         className="hidden"
+            //       />
+            //     </div>
+            //     {/* ============================================ */}
+            //     {/* Admin ========================== */}
+            //     <div
+            //       onClick={(e) => setRole("admin")}
+            //       className={`flex flex-col flex-wrap justify-center items-center  box-border
+            //         h-15 w-40 rounded-md
+            //         ${role === "admin" ? "border-5 border-indigo-600" : ""}`}
+            //     >
+            //       <div
+            //         className={`flex flex-flex-wrap justify-between items-center px-2
+            //           py-2`}
+            //       >
+            //         <label htmlFor="adminRole">Admin</label>
+            //         <RiAdminFill
+            //           className={
+            //             (role === "admin" ? "text-gray-600" : "") +
+            //             " w-12 h-7.5"
+            //           }
+            //         />
+            //       </div>
+            //       <input
+            //         id="adminRole"
+            //         name="role"
+            //         type="radio"
+            //         value="admin"
+            //         checked={role === "admin"}
+            //         onChange={(e) =>
+            //           setRole((state) => {
+            //             if (state !== "admin") return "admin";
+            //             return state;
+            //           })
+            //         }
+            //         className="hidden"
+            //       />
+            //     </div>
+            //     {/* ======================================= */}
+            //   </div>
+            // </div>;

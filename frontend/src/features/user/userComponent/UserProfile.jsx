@@ -6,7 +6,7 @@ export default function UserProfile() {
   const dispatch = useDispatch();
   const userInfo = useSelector((state)=>state.user.userInfo);
   const [isAddressModalOpen,setIsAddressModalOpen] = useState(0);
-  const {userName,email : userEmail , addresses : userAddresses} = userInfo;
+  const {name:userName,email : userEmail , addresses : userAddresses} = userInfo;
   const handleRemove = async (e, index) => {
     console.log(userInfo," ",index);
 
@@ -26,13 +26,13 @@ export default function UserProfile() {
       </div>
       {/* ====================== */}
 
-      <div className="mx-auto max-w-7xl border-8">
+      <div className="mx-auto max-w-7xl ">
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1 ">
           {/* TODO : For Every Order we need a seperate below componenet ....
           the div below duplicates order=========== */}
 
-          <div className="mt-2 lg:col-span-1 relative border-1 ">
-            { !(!isAddressModalOpen) && (
+          <div className="mt-2 lg:col-span-1 relative">
+            {!!isAddressModalOpen && (
               <UserOrderForm
                 isAddressModalOpen={isAddressModalOpen}
                 setIsAddressModalOpen={setIsAddressModalOpen}
@@ -41,7 +41,7 @@ export default function UserProfile() {
             <div className="flex  flex-col overflow-y-scroll bg-white shadow-xl ">
               {/* Outermost Border .... Below  */}
               <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 ">
-                <div className="info-center flex flex-row justify-between mb-3 border-8">
+                <div className="info-center flex flex-row justify-between mb-3">
                   {/* Profile Picture &  Name =========================== */}
                   <div className="profile-center grid place-items-center">
                     <div className="size-50 shrink-0 rounded-full overflow-hidden border-gray-200">
@@ -52,27 +52,37 @@ export default function UserProfile() {
                       />
                     </div>
                     <h1 className="text-2xl font-medium text-gray-900">
-                      Name : {userName ? null : "Guest"}
+                       {userName ? null : "Guest"}
                     </h1>
                   </div>
                   {/* ====================================== */}
 
                   <div className="primary-info flex flex-col gap-2 justify-center">
-                    <h1 className="text-2xl font-medium text-gray-900">
-                      Email : {userEmail ? null : "guest@gmail.com"}
-                    </h1>
-                    <h1 className="text-2xl font-medium text-gray-900">
-                      Phone : {!userEmail ? userEmail : "+91 0000000000"}
-                    </h1>
+                    <div className="flex justify-baseline gap-2">
+                      <p className="text-xl font-light text-gray-900">Name</p>
+                      <h1 className="text-xl font-medium text-gray-900">
+                        : {userName ? userName : "Guest"}
+                      </h1>
+                    </div>
+                    <div className="flex justify-baseline gap-2">
+                      <p className="text-xl font-light text-gray-900">Email</p>
+                      <h1 className="text-xl font-medium text-gray-900">
+                        : {userEmail ? userEmail : "guest@gmail.com"}
+                      </h1>
+                    </div>
+                    {/* <h1 className="text-2xl font-medium text-gray-900">
+                      Phone :{" "}
+                      {userInfo?.phoneNo ? userInfo.phoneNo : "+91 0000000000"}
+                    </h1> */}
                   </div>
                 </div>
 
-                <div className="mt-8 border-10">
+                <div className="mt-8 py-4">
                   <div className="address-heading flex flex-row justify-between">
                     <h1>Addresses</h1>
                     <button
                       type="button"
-                      className="bg-indigo-600 border-8 cursor-pointer"
+                      className="bg-indigo-600 cursor-pointer rounded-md p-2"
                       onClick={() => setIsAddressModalOpen("add")}
                     >
                       Add Address
@@ -121,7 +131,9 @@ export default function UserProfile() {
                               <div className="flex flex-row justify-between px-2">
                                 <button
                                   type="button"
-                                  onClick={(e) => setIsAddressModalOpen(index+1)}
+                                  onClick={(e) =>
+                                    setIsAddressModalOpen(index + 1)
+                                  }
                                   className="px-3 py-2 text-sm font-semibold text-indigo-600  hover:text-indigo-500"
                                 >
                                   Edit

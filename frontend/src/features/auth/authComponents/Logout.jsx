@@ -6,7 +6,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../../cart/CartSlice";
 import { clearOrders } from "../../order/OrderSlice";
 import { clearProducts } from "../../productList/productListSlice";
+import { logoOutUserInfoAsync } from "../../user/UserSlice"; 
 import { clearAuthUser } from "../AuthSlice";
+// expiry the token ....
 import {clearUserInfo} from '../../user/UserSlice'
 const Logout = () => {
   const dispatch = useDispatch();
@@ -20,6 +22,7 @@ const Logout = () => {
     dispatch(clearOrders());
     dispatch(clearProducts());
     dispatch(clearAuthUser());
+    dispatch(logoOutUserInfoAsync());
     dispatch(clearUserInfo());
   }, [dispatch]);
   console.log(user);

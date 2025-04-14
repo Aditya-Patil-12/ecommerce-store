@@ -1,18 +1,28 @@
 import { Link, Navigate , useParams } from "react-router";
-import { deleteCompleteUserCartAsync } from "../features/cart/CartSlice";
+import { deleteCompleteUserCartAsync ,clearCart } from "../features/cart/CartSlice";
 import { resetCurrentOrder } from "../features/order/OrderSlice";
+import {fetchProductByFiltersAsync} from '../features/productList/productListSlice'
 import { useSelector,useDispatch } from "react-redux";
 import { useEffect } from "react";
 export default function OrderSuccessPage() {
     const dispatch = useDispatch();
     const {id} = useParams();
+    // productList State Variable .....
+    const filterQuery = useSelector((state)=>state.product.filterQuery);
+    const sortQuery = useSelector((state)=>state.product.sortQuery);
+    const page = useSelector((state)=>state.product.page);
     console.log("Hey id is ",id);
     
     const {id : userId} = useSelector((state)=>state.user.userInfo);
 
     useEffect(()=>{
-        dispatch(deleteCompleteUserCartAsync(userId));
-        dispatch(resetCurrentOrder(null));
+        const adjustOrderChanges = async () =>{
+            await dispatch(deleteCompleteUserCartAsync(userId));
+            await dispatch(resetCurrentOrder(null));
+            await dispatch(clearCart());
+            await dispatch(fetchProductByFiltersAsync({filterQuery,sortQuery,page}));
+        }
+        adjustOrderChanges();
     },[dispatch,userId]);
 
 

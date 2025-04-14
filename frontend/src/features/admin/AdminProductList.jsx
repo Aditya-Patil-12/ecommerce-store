@@ -224,7 +224,7 @@ function Filters({ filters, handleFilters }) {
                   </div>
                   <label
                     htmlFor={`filter-${section.id}-${optionIdx}`}
-                    className="text-sm text-gray-600 border-8"
+                    className="text-sm text-gray-600"
                   >
                     {option.label}
                   </label>
@@ -461,7 +461,7 @@ function DesktopComponent({
           {/* Filters end ============ */}
 
           {/* Product grid */}
-          <div className="lg:col-span-5 border-8">
+          <div className="lg:col-span-5 ">
             {status === "loading" ? (
               <div className="flex justify-center">
                 <ThreeDots

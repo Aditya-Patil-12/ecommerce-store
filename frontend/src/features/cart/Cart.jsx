@@ -14,16 +14,16 @@ export default function Cart() {
   const totalItems = useSelector((state) => state.cart.totalItems);
   const amount = useSelector((state) => state.cart.amount);
   const isCartFetched = useSelector((state)=>state.cart.status);
-  const products = useSelector((state)=>state.cart.cart);
+  const cart = useSelector((state)=>state.cart.cart);
   // console.log("*(*(*(*(*(*H",isCartFetched,"  ",products);
   const removeProductDispatcher = async (item) =>{
     console.log(item);
     await dispatch(deleteCartItemAsync({
-      id:(item.id) ,
-      updateByAmount: -((+item.quantity)*(+item.price)) ,
+      id:(item.product.id) ,
+      updateByAmount: -((+item.quantity)*(+item.product.price)) ,
       updateByItem:(-(+item.quantity))
     }));
-    toast.success(`${item?.title} Deleted Succesfully`);
+    toast.success(`${item?.product.title} Deleted Succesfully`);
   }
   const handleRemove = async (item)=>{
     setOpen(item);
@@ -53,7 +53,8 @@ export default function Cart() {
     ));
   }
   
-  if ( (isCartFetched === "idle") && products.length === 0) {
+  if ( (isCartFetched === "idle") && cart.length === 0) {
+    toast.warning('Cart Empty, Please Buy Products');
     return <Navigate to="/products"  />;
   }
   if( isCartFetched === "loading" ){
@@ -68,7 +69,9 @@ export default function Cart() {
   wrapperClass=""
   />)
   }
-  console.log(open);
+  // console.log(cart);
+  
+  // console.log(open);
   // console.log(generateOptions(12));
   return (
     <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
@@ -90,12 +93,12 @@ export default function Cart() {
         <div className="mt-8">
           <div className="flow-root pl-10 pr-10">
             <ul role="list" className="-my-6 divide-y divide-gray-200">
-              {products.map((product) => (
-                <li key={product.id} className="flex py-6">
+              {cart.map((product) => (
+                <li key={product._id} className="flex py-6">
                   <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
                     <img
-                      src={product?.images[0]}
-                      alt={product.title}
+                      src={product.product?.thumbnail}
+                      alt={product.product.title}
                       className="size-full object-cover"
                     />
                   </div>
@@ -104,12 +107,12 @@ export default function Cart() {
                     <div>
                       <div className="flex justify-between text-base font-medium text-gray-900">
                         <h3>
-                          <a href={product.href}>{product.title}</a>
+                          <a href={"#"}>{product.product.title}</a>
                         </h3>
-                        <p className="ml-4">{product.price}</p>
+                        <p className="ml-4">{product.product.price}</p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500">
-                        {product.color.name}
+                        {product.product.color}
                       </p>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
@@ -131,7 +134,7 @@ export default function Cart() {
                           type="button"
                           onClick={() =>
                             handleChange(
-                              Math.min(product.stock, product.quantity + 1),
+                              Math.min(product.product.stock, product.quantity + 1),
                               product
                             )
                           }

@@ -1,25 +1,15 @@
-// this will be an API call to Respective thing
-import { default as axios } from "axios";
+import axios from '../../app/axiosConfig'
 import { productListLimit } from "../../app/constants";
-import { useSelector } from "react-redux";
+const productServerUrl = "products/";
+const filtersServerUrl = "filters/";
 
-async function productListAPI() {
-  // console.log("entered to fetch data");
-  const response = await axios.get(
-    // "http://localhost:5000/api/v1/product/getAllProducts"
-    `http://localhost:5000/products`
-  );
-  // console.log("Product List Received", response.data);
-  return [...response.data];
-}
 
 async function singleProductAPI(id) {
-  // "http://localhost:5000/api/v1/product/getAllProducts"
   try {
-    const response = await axios.get(`http://localhost:5000/products?id=${id}`);
-    return { ...response.data };
+    const response = await axios.get(productServerUrl+id);
+    return { product:response.data,success:true };
   } catch (error) {
-    return { msg: "Single Product Fetching Error" };
+    return { msg:error.response.payload.msg ,success:false };
   }
 }
 
@@ -35,10 +25,17 @@ async function productsByFiltersAPI({filterQuery, sortQuery,page}) {
   
   let queryString = "";
   for (let [key, value] of Object.entries(filterQuery)) {
-    if( value.length ){
-      queryString += key + "=" + value[value.length-1] + "&";
+    if (value.length) {
+      let filterTypeValues = "";
+      for (let val of value) {
+        filterTypeValues += val + ",";
+      }
+      console.log(filterTypeValues);
+      filterTypeValues = filterTypeValues.slice(0, filterTypeValues.length - 1);
+      queryString += key + "=" + filterTypeValues + "&";
     }
   }
+
   if( Object.keys(sortQuery).length ){
     queryString += (sortQuery.filterType+"="+sortQuery.value+"&");
   }
@@ -49,58 +46,64 @@ async function productsByFiltersAPI({filterQuery, sortQuery,page}) {
 
   console.log("fetching for ", queryString);
   try {
-    const response = await axios.get(
-      `http://localhost:5000/products?` + `${queryString}`
-    );
-    
-    return {data:response.data.data,totalItems:response.data.items};
+    const response = await axios.get(productServerUrl.slice(0,-1)+"?"+`${queryString}`);
+    return {
+      products: response.data.products,
+      totalItems: response.data.items,
+      success: true,
+    };
   } catch (error) {
-    return { msg: "Single Product Fetching Error" };
+    return { msg: error.response.payload.msg, success: false };
   }
 }
 
+
+
+
+
 async function productsFiltersListAPI() {
-  // "http://localhost:5000/api/v1/product/getAllProducts"
   try {
-    // console.log("Was there ");
-    const response = await axios.get(`http://localhost:5000/filters`);
+
+    const response = await axios.get(filtersServerUrl);
     // console.log("*&^&%^%^&%^%^asdfa"+response.data);
-    let fetchedFilters =  response.data;
-    let newFetchedFilters =[];
-    for(let key in fetchedFilters){
-      newFetchedFilters.push(...fetchedFilters[key]);
-    }
-    // console.log("show me ", newFetchedFilters);
-    return newFetchedFilters;
+    let fetchedFiltersObject = response.data;
+    let filterArray = [];
+    for (let key in fetchedFiltersObject)
+      filterArray.push(...fetchedFiltersObject[key]);
+    console.log("show me ", filterArray);
+    return { filters: filterArray, success: true };
   } catch (error) {
-    return { msg: "Fetching Filters Error" };
+    return { msg: "Fetching Filters Error",success:false};
   }
 }
+
+
 const addProductAPI = async(product) =>{
   try {
     console.log(product);
-    const response = await axios.post(`http://localhost:5000/products`,product);
-    console.log(response);
-    return {data:response.data,success:true};
+    const response = await axios.post(productServerUrl,product);
+    console.log(response.data);
+    return { data: response.data, success: true };
   } catch (error) {
-    return { msg: "Add A New Product Error", success:false };
+    return { msg: error.response.payload.msg, success: false };
   }
 }
+
 const editProductAPI = async (product) => {
-  let response;
   try {
     console.log(product);
-    response = await axios.patch(`http://localhost:5000/products/${product.id}`, product);
-    console.log(response);
+    const response = await axios.patch(
+      productServerUrl+product.id,
+      product
+    );
+    return { product: response.data, success: true };
   } catch (error) {
     return { msg: "Fetching Filters Error", success: false };
   }
-  return { data:response.data, success: true };
 };
 
 export {
   singleProductAPI,
-  productListAPI,
   productsByFiltersAPI,
   productsFiltersListAPI,
   addProductAPI,
