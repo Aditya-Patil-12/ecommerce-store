@@ -13,7 +13,8 @@ const isTokenValid = ({ token }) => {
 
 const attachCookiesToResponse = ({ payload, res }) => {
   const token = createJWT({ payload: payload });
-  const COOKIE_LIFETIME = 1000 * 60 * 10;
+  const COOKIE_LIFETIME = 1000 * 60 * 60;
+  console.log("payload for cookie ",token);
   res.cookie("token", token, {
     httpOnly: true,
     expires: new Date(Date.now() + COOKIE_LIFETIME),

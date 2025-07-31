@@ -73,9 +73,9 @@ const loginController = async (req, res) => {
   console.log(user);
   
   const tokenUser = createTokenUser({ user: user });
-  // // console.log(tokenUser);
+  console.log(tokenUser);
   attachCookiesToResponse({ payload: tokenUser, res: res });
-  // // console.log(res);
+  console.log(res);
   return res.status(StatusCodes.OK).json({id: _id ,email});
 };
 
