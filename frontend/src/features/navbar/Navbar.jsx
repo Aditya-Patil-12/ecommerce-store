@@ -41,7 +41,7 @@ function classNames(...classes) {
 }
 function Navbar({ children }) {
   // const dispatch = useDispatch();
-  const totalItems = useSelector((state) => state.cart.totalItems);
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
   const userInfo = useSelector((state)=>state.user.userInfo);
 
   
@@ -66,7 +66,7 @@ function Navbar({ children }) {
                     {navigation.map((item) =>
                       item[userInfo?.role] ? (
                         <Link
-                          key={item.name+ ( (item.admin) ? "admin":"customer") }
+                          key={item.name + (item.admin ? "admin" : "customer")}
                           to={item.link}
                           aria-current={item.current ? "page" : undefined}
                           className={classNames(
@@ -97,9 +97,9 @@ function Navbar({ children }) {
                           className="size-6 "
                         />
                       </button>
-                      {totalItems > 0 && (
+                      {totalQuantity > 0 && (
                         <span className="absolute inline-flex items-center rounded-md -top-3 left-4 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-600/10 ring-inset">
-                          {totalItems}
+                          {totalQuantity}
                         </span>
                       )}
                     </Link>
@@ -123,25 +123,25 @@ function Navbar({ children }) {
                       transition
                       className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                     >
-                      {userNavigation.map((item) => (
-                          item[userInfo?.role] ? (
-                            <MenuItem
-                              key={
-                                item.name +
-                                (item["admin"] === "admin"
-                                  ? " admin"
-                                  : " customer")
-                              }
+                      {userNavigation.map((item) =>
+                        item[userInfo?.role] ? (
+                          <MenuItem
+                            key={
+                              item.name +
+                              (item["admin"] === "admin"
+                                ? " admin"
+                                : " customer")
+                            }
+                          >
+                            <Link
+                              to={item.link}
+                              className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
                             >
-                              <Link
-                                to={item.link}
-                                className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                              >
-                                {item.name}
-                              </Link>
-                            </MenuItem>
-                          ) : null
-                      ))}
+                              {item.name}
+                            </Link>
+                          </MenuItem>
+                        ) : null
+                      )}
                     </MenuItems>
                   </Menu>
                 </div>
@@ -171,7 +171,7 @@ function Navbar({ children }) {
                 item[userInfo?.role] ? (
                   <Link
                     to={item.link}
-                    key={item.name + " " + (item.admin)?"admin":"customer"}
+                    key={item.name + " " + item.admin ? "admin" : "customer"}
                     aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
@@ -221,19 +221,20 @@ function Navbar({ children }) {
                 </Link>
               </div>
               <div className="mt-3 space-y-1 px-2">
-                {userNavigation.map((item) => (
-                  item[user?.role] ? 
-                 ( <Link
-                    to=""
-                    key={
-                      item.name +
-                      (item["admin"] === "admin" ? " admin" : " customer")
-                    }
-                    className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                  >
-                    {item.name}
-                  </Link>) :null
-                ))}
+                {userNavigation.map((item) =>
+                  item[user?.role] ? (
+                    <Link
+                      to=""
+                      key={
+                        item.name +
+                        (item["admin"] === "admin" ? " admin" : " customer")
+                      }
+                      className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : null
+                )}
               </div>
             </div>
           </DisclosurePanel>

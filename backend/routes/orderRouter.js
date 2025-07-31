@@ -10,15 +10,18 @@ const {
   currentUserOrders,
   updateOrder,
   allOrders,
+  verifyPayment,
 } = require("../controllers/orderController");
 
 router
   .route("/")
-  .get([authenticateUser, authorizePermissions("admin")], allOrders)
+  .get([authenticateUser,authorizePermissions("admin")],allOrders)
   .post([authenticateUser], createOrder);
 
 // this is above
 router.route("/showAllMyOrders").get([authenticateUser], currentUserOrders);
+router.route("/verifyOrderPayment").post([authenticateUser],verifyPayment);
+// router.route("/verifyOrderPayment").post([authenticateUser], verifyPayment);
 
 router
   .route("/:id")

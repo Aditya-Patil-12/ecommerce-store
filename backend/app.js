@@ -9,10 +9,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const fileUpload =require('express-fileupload');
-const rateLimiter = require('express-rate-limit');
+const rateLimiter = require('express-rate-limit'); 
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean')
 const helmet =require('helmet');
+const RazorPay = require("razorpay");
 // database connect =============>
 const connectDB = require("./db/connect");
 
@@ -31,13 +32,14 @@ const orderRouter = require('./routes/orderRouter');
 // const { addCategoryDB } = require("./controllers/categoryController");
 // const singleAct = require("./addData");
 // const User = require("./models/User");
-const data = require('./data/products') ; 
+// const data = require('./data/products') ; 
 const Product = require("./models/Product");
 
 
 // MiddleWares Imports  ===========>
 const notFoundMiddleWare = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+const { loginController } = require("./controllers/authController");
 
 
 
@@ -51,12 +53,17 @@ const errorHandlerMiddleware = require("./middleware/error-handler");
 // app.use(helmet());
 // app.use(xss());
 // app.use(mongoSanitize());
+// app.use((req,res,next)=>{
+//   console.log(req.headers);
+//   next();
+// })
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
+// app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json()); /// to parse json type body
 // if your signed flag is true please provide JWT_SECRET to encrypt
@@ -65,7 +72,9 @@ app.use(express.static('./public'))
 app.use(fileUpload());
 
 
+// app.options((req,res)=>{
 
+// })
 // Routes are starting from here  ....
 app.get("/", (req, res) => {
   res.json({ success: true });
@@ -79,6 +88,22 @@ app.post("/api/v1", (req, res) => {
   res.json({ success: true });
 });
 
+app.post("/api/v1/verifyPay",(req,res)=>{
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+    req.body;
+
+  // Do signature verification...
+
+  // After verifying, store info in DB or session
+  // Then redirect user
+  console.log("Post was here");
+  
+  res.redirect(`http://localhost:5173/order-success/${razorpay_order_id}`);
+});
+app.get('/api/v1/verifyPay',(req,res)=>{
+  console.log("Get was here");
+  res.redirect(`http://localhost:5173/order-success/${123}`);
+});
 // use Routers =================>
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
@@ -128,6 +153,7 @@ const start = async () => {
 
     console.log(port);
     await connectDB(process.env.MONGO_URI);
+    console.log("Database Connected ......")
     await app.listen(port, () => {
       console.log("Server started Listening in App.js Backend");
     });
@@ -136,5 +162,7 @@ const start = async () => {
     console.log(error);
   }
 };
+
 start();
 
+// require('./test.js')

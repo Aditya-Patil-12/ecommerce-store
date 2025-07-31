@@ -2,11 +2,46 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUserInfoAsync } from "../UserSlice";
 import { useState } from "react";
 import UserOrderForm from "./UserOrderForm";
+import { AiOutlineLogout } from "react-icons/ai";
+import { FaPhoneAlt } from "react-icons/fa";
+import ProfileInfo from "./profileInfo/ProfileInfo";
+import { SiGmail } from "react-icons/si";
+import './userProfile.css';
+import UserAddress from "./Address/userAddress";
+import PaymentInfo from "./Payment/PaymentInfo";
+import { Link } from "react-router";
+const accountInfoOptions = [
+  {
+    name:"Profile",
+    component: ProfileInfo,
+    key:"1",
+  },
+  {
+    name: "Address Info",
+    component: UserAddress,
+    key:"2",
+  }
+];
+const paymentInfoOptions = [
+  {
+    name: "Payment Info",
+    component: PaymentInfo,
+  },
+];
+
+
 export default function UserProfile() {
   const dispatch = useDispatch();
   const userInfo = useSelector((state)=>state.user.userInfo);
-  const [isAddressModalOpen,setIsAddressModalOpen] = useState(0);
   const {name:userName,email : userEmail , addresses : userAddresses} = userInfo;
+  const [isAddressModalOpen,setIsAddressModalOpen] = useState(0);
+  const [seeInfo,setSeeInfo] = useState(-1);
+  let InfoComp = null;
+  if( seeInfo != -1 ){
+    InfoComp = accountInfoOptions[seeInfo].component;
+  }
+  // console.log(InfoComp);
+  
   const handleRemove = async (e, index) => {
     console.log(userInfo," ",index);
 
@@ -15,141 +50,93 @@ export default function UserProfile() {
     newAddresses.addresses.splice(index, 1);
     console.log("old :" ,userInfo);
     console.log("new :",newAddresses);
+
     await dispatch(updateUserInfoAsync(newAddresses));
   }
 
   return (
     <>
       {/* Heading ============== */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between border-1 border-green-1000">
         <h1 className="text-2xl font-medium text-gray-900">My Profile</h1>
       </div>
       {/* ====================== */}
 
-      <div className="mx-auto max-w-7xl ">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1 ">
+      <div className="mx-auto min-w-0.9">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1 bg-transparent">
           {/* TODO : For Every Order we need a seperate below componenet ....
           the div below duplicates order=========== */}
 
-          <div className="mt-2 lg:col-span-1 relative">
+          <div className="lg:col-span-1 relative border-red-500">
             {!!isAddressModalOpen && (
               <UserOrderForm
                 isAddressModalOpen={isAddressModalOpen}
                 setIsAddressModalOpen={setIsAddressModalOpen}
               />
             )}
-            <div className="flex  flex-col overflow-y-scroll bg-white shadow-xl ">
-              {/* Outermost Border .... Below  */}
-              <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 ">
-                <div className="info-center flex flex-row justify-between mb-3">
-                  {/* Profile Picture &  Name =========================== */}
-                  <div className="profile-center grid place-items-center">
-                    <div className="size-50 shrink-0 rounded-full overflow-hidden border-gray-200">
+
+            <div className="grid gap-x-7 gap-y-7 grid-rows-3 shadow-xl border-red-950 bg-transparent profileArea">
+              {/* Profile Picture &  Name =========================== */}
+              <div className="profilePhotoArea bg-white">
+                <div className="h-full">
+                  <div className="h-4/5 grid place-items-center">
+                    <div className="h-9/10 w-3/5 rounded-2xl border-1">
                       <img
                         src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                         alt="Profile-Pic"
-                        className="size-full object-cover"
+                        className="w-1/1 h-1/1 object-cover overflow-hidden rounded-2xl"
                       />
                     </div>
-                    <h1 className="text-2xl font-medium text-gray-900">
-                       {userName ? null : "Guest"}
-                    </h1>
                   </div>
-                  {/* ====================================== */}
-
-                  <div className="primary-info flex flex-col gap-2 justify-center">
-                    <div className="flex justify-baseline gap-2">
-                      <p className="text-xl font-light text-gray-900">Name</p>
-                      <h1 className="text-xl font-medium text-gray-900">
-                        : {userName ? userName : "Guest"}
-                      </h1>
-                    </div>
-                    <div className="flex justify-baseline gap-2">
-                      <p className="text-xl font-light text-gray-900">Email</p>
-                      <h1 className="text-xl font-medium text-gray-900">
-                        : {userEmail ? userEmail : "guest@gmail.com"}
-                      </h1>
-                    </div>
-                    {/* <h1 className="text-2xl font-medium text-gray-900">
-                      Phone :{" "}
-                      {userInfo?.phoneNo ? userInfo.phoneNo : "+91 0000000000"}
-                    </h1> */}
-                  </div>
+                  <div className="h-1/5 border-1">{userInfo.name}</div>
                 </div>
-
-                <div className="mt-8 py-4">
-                  <div className="address-heading flex flex-row justify-between">
-                    <h1>Addresses</h1>
-                    <button
-                      type="button"
-                      className="bg-indigo-600 cursor-pointer rounded-md p-2"
-                      onClick={() => setIsAddressModalOpen("add")}
-                    >
-                      Add Address
-                    </button>
-                  </div>
-
-                  {/* TODO : study flow root */}
-
-                  <div className="flow-root mt-5 px-2 py-2">
-                    <ul
-                      role="list"
-                      className="-my-6 divide-y divide-black-1000"
-                    >
-                      {userAddresses.length === 0 && (
-                        <li>
-                          <h1>Please Provide At Least One Address</h1>
-                        </li>
-                      )}
-                      {userAddresses &&
-                        userAddresses.map((address, index) => (
-                          <div
-                            className="flex flex-col py-6"
-                            key={address.fullName}
+              </div>
+              <div className="bg-white min-h-150 infoDisplay">
+                {
+                InfoComp &&
+                <InfoComp />
+                }
+              </div>
+              <div className="border-1 bg-white optionDisplay">
+                <div className="accountInfo">
+                  <h1>Account Information</h1>
+                  <ul className="pl-5">
+                    {accountInfoOptions.map((info, index) => {
+                      return (
+                        <li key={info.key}>
+                          <button
+                            type="button"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSeeInfo(index);
+                            }}
                           >
-                            <div className="flex flex-col">
-                              <div className="address-info flex flex-row justify-between">
-                                <div className="flex min-w-0 gap-x-4">
-                                  <div className="min-w-0 flex-auto">
-                                    <p className="text-sm/6 font-bold text-gray-900">
-                                      {address.fullName}
-                                    </p>
-                                    <p className="mt-1 truncate text-xs/5 text-gray-500">
-                                      {address.phoneNo}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                                  <p className="font-bold text-gray-900">
-                                    {address.city}
-                                  </p>
-                                  <p className="mt-1 text-xs/5 text-gray-500">
-                                    {address["postal-code"]}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex flex-row justify-between px-2">
-                                <button
-                                  type="button"
-                                  onClick={(e) =>
-                                    setIsAddressModalOpen(index + 1)
-                                  }
-                                  className="px-3 py-2 text-sm font-semibold text-indigo-600  hover:text-indigo-500"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleRemove(e, index)}
-                                  className="px-3 py-2 text-sm font-semibold text-indigo-600  hover:text-indigo-500"
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </ul>
+                            {info.name}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                <div className="paymentInfo">paymentInfo</div>
+                <div className="Logout border">
+                  <Link
+                    to="/logout"
+                    className="w-full cursor-pointer block"
+                    type="button"
+                  >
+                    <AiOutlineLogout className="inline" /> Logout
+                  </Link>
+                </div>
+              </div>
+              <div className="contactUs bg-white h-20">
+                <h2 className="">Contact Us </h2>
+                <div className="pl-2">
+                  <div>
+                    <FaPhoneAlt className="inline" /> +91 9326753816
+                  </div>
+                  <div>
+                    <SiGmail className="inline" /> ecommercestore@gmail.com
                   </div>
                 </div>
               </div>
@@ -161,3 +148,6 @@ export default function UserProfile() {
   );
 }
 
+/*
+
+*/

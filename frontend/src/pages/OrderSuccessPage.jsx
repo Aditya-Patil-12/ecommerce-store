@@ -7,6 +7,15 @@ import { useEffect } from "react";
 export default function OrderSuccessPage() {
     const dispatch = useDispatch();
     const {id} = useParams();
+    console.log(id);
+    
+    // // React: /payment-success route
+    // const params = new URLSearchParams(window.location.search);
+    // const payment_id = params.get("razorpay_payment_id");
+    // const order_id = params.get("razorpay_order_id");
+    // const signature = params.get("razorpay_signature");
+    // console.log(payment_id," ",order_id," ",signature);
+
     // productList State Variable .....
     const filterQuery = useSelector((state)=>state.product.filterQuery);
     const sortQuery = useSelector((state)=>state.product.sortQuery);

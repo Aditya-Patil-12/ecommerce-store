@@ -40,13 +40,12 @@ export default function AdminProductForm() {
   const products = useSelector((state)=>state.product.products);
   const index = products.find((product)=> product.id === "101");
   const navigate = useNavigate();
-  console.log(index);
+  // console.log(index);
   
   const params = useParams();
-  const categories = filters[0];
-  const brands = filters[1];
-
-  console.log();
+  const categories = filters[1];
+  const brands = filters[0];
+  // console.log(categories, " ", brands);
   
   useEffect(() => {
     if (params.id && !selectedProduct) {

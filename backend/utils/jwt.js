@@ -10,6 +10,7 @@ const createJWT = ({ payload }) => {
 const isTokenValid = ({ token }) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
+
 const attachCookiesToResponse = ({ payload, res }) => {
   const token = createJWT({ payload: payload });
   const COOKIE_LIFETIME = 1000 * 60 * 10;

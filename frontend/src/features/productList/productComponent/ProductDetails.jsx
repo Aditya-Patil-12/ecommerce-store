@@ -6,6 +6,7 @@ import { fetchProductDetailAsync } from "../productListSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { addToCartAsync } from "../../cart/CartSlice";
+import calculateProductCosting from "../../../utils/calculateProductCosting";
 import { toast } from "react-toastify";
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
@@ -57,8 +58,11 @@ export default function ProductDetails() {
     if( quantity == 0 ){
       return ;
     }
+    // here item
+    let costing = calculateProductCosting({ ...product, quantity: quantity });
+    console.log("Here is the final Costing ::: ", costing);
     await dispatch(addToCartAsync(
-      {quantity:(+quantity),color:"Red",size:selectedSize.name,product:product.id}));
+      {quantity:(+quantity),color:"Red",...costing,size:selectedSize.name,product:product.id}));
     toast.success("Product Added");
     // console.log("After Adding moving to cart");
     await setShopped(true);

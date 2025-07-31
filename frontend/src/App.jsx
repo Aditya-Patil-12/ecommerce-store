@@ -1,3 +1,4 @@
+"use client";
 import "./App.css";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
@@ -11,6 +12,7 @@ import {
   ProductDetailPage,
   UserOrdersPage,
   UserProfilePage,
+  OrderTrackingPage,
   PageNotFound,
   OrderSuccessPage,
   SharedLayoutPage,
@@ -54,183 +56,191 @@ function App() {
   return (
     // rootUrl of the browser is fetched Over here .....
     <>
-    {/* <ToastContainer/> */}
-    <BrowserRouter>
-      <Routes>
-        {/* these are the login Sign Up Pages ...... */}
-        <Route
-          path="/login"
-          element={
-            <>
-              <LoginPage />
-            </>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <>
-              <SignUpPage />
-            </>
-          }
-        />
-        <Route
-          path="/logout"
-          element={
-            // <Protected>
-            <>
-              <LogoutPage />
-            </>
-            // </Protected>
-          }
-        />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        {/* ======================================== */}
-        {/* TODO : Provide the Home Page (Landing Page access to Any User) */}
-        <Route
-          path="/"
-          element={
-            <Protected>
-              <SharedLayoutPage />
-            </Protected>
-          }
-        >
+      {/* <ToastContainer/> */}
+      <BrowserRouter>
+        <Routes>
+          {/* these are the login Sign Up Pages ...... */}
           <Route
-            index
+            path="/login"
             element={
-              <Protected>
-                <HomePage />
-              </Protected>
+              <>
+                <LoginPage />
+              </>
             }
           />
           <Route
-            path="/products"
+            path="/signup"
             element={
-              <Protected>
-                <ProductsPage />
-              </Protected>
+              <>
+                <SignUpPage />
+              </>
             }
           />
-
           <Route
-            path="/cart"
+            path="/logout"
             element={
-              <Protected>
-                <CartPage />
-              </Protected>
+              // <Protected>
+              <>
+                <LogoutPage />
+              </>
+              // </Protected>
             }
           />
-
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          {/* ======================================== */}
+          {/* TODO : Provide the Home Page (Landing Page access to Any User) */}
           <Route
-            path="/checkout"
+            path="/"
             element={
               <Protected>
-                <CheckOutPage />
+                <SharedLayoutPage />
               </Protected>
             }
-          />
+          >
+            <Route
+              index
+              element={
+                <Protected>
+                  <HomePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/products"
+              element={
+                <Protected>
+                  <ProductsPage />
+                </Protected>
+              }
+            />
 
+            <Route
+              path="/cart"
+              element={
+                <Protected>
+                  <CartPage />
+                </Protected>
+              }
+            />
+
+            <Route
+              path="/checkout"
+              element={
+                <Protected>
+                  <CheckOutPage />
+                </Protected>
+              }
+            />
+
+            <Route
+              path="/product-detail/:id"
+              element={
+                <Protected>
+                  <ProductDetailPage />
+                </Protected>
+              }
+            />
+
+            <Route
+              path="/order-success/:id"
+              element={
+                // <Protected>
+                  <OrderSuccessPage />
+                // {/* </Protected> */}
+              }
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <Protected>
+                  <UserProfilePage />
+                </Protected>
+              }
+            />
+
+            <Route
+              path="/orders"
+              element={
+                <Protected>
+                  <UserOrdersPage />
+                </Protected>
+              }
+            />
+
+            <Route
+              path="/singleOrder/:id"
+              element={
+                <Protected>
+                  <OrderTrackingPage />
+                </Protected>
+              }
+            />
+            <Route path="*" element={<PageNotFound />} />
+          </Route>
+
+          {/* Admin Routes ===============================*/}
           <Route
-            path="/product-detail/:id"
-            element={
-              <Protected>
-                <ProductDetailPage />
-              </Protected>
-            }
-          />
-
-          <Route
-            path="/order-success/:id"
-            element={
-              <Protected>
-                <OrderSuccessPage />
-              </Protected>
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              <Protected>
-                <UserProfilePage />
-              </Protected>
-            }
-          />
-
-          <Route
-            path="/orders"
-            element={
-              <Protected>
-                <UserOrdersPage />
-              </Protected>
-            }
-          />
-
-          <Route path="*" element={<PageNotFound />} />
-        </Route>
-
-        {/* Admin Routes ===============================*/}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedAdmin>
-              <SharedLayoutPage />
-            </ProtectedAdmin>
-          }
-        >
-          <Route
-            index
+            path="/admin"
             element={
               <ProtectedAdmin>
-                <AdminHomePage />
+                <SharedLayoutPage />
               </ProtectedAdmin>
             }
-          />
-          <Route
-            path="products"
-            element={
-              <ProtectedAdmin>
-                <AdminProductPage />
-              </ProtectedAdmin>
-            }
-          />
-          <Route
-            path="product-detail/:id"
-            element={
-              <ProtectedAdmin>
-                <AdminProductDetailPage />
-              </ProtectedAdmin>
-            }
-          />
-          <Route
-            path="orders"
-            element={
-              <ProtectedAdmin>
-                <AdminOrdersPage />
-              </ProtectedAdmin>
-            }
-          />
-          <Route
-            path="productForm"
-            element={
-              <ProtectedAdmin>
-                <AdminProductFormPage />
-              </ProtectedAdmin>
-            }
-          />
-          <Route
-            path="productForm/edit/:id"
-            element={
-              <ProtectedAdmin>
-                <AdminProductFormPage />
-              </ProtectedAdmin>
-            }
-          />
-        </Route>
-        {/* ========================== */}
-        <Route path="/demo" element={<Demo />} />
-      </Routes>
-    </BrowserRouter>
+          >
+            <Route
+              index
+              element={
+                <ProtectedAdmin>
+                  <AdminHomePage />
+                </ProtectedAdmin>
+              }
+            />
+            <Route
+              path="products"
+              element={
+                <ProtectedAdmin>
+                  <AdminProductPage />
+                </ProtectedAdmin>
+              }
+            />
+            <Route
+              path="product-detail/:id"
+              element={
+                <ProtectedAdmin>
+                  <AdminProductDetailPage />
+                </ProtectedAdmin>
+              }
+            />
+            <Route
+              path="orders"
+              element={
+                <ProtectedAdmin>
+                  <AdminOrdersPage />
+                </ProtectedAdmin>
+              }
+            />
+            <Route
+              path="productForm"
+              element={
+                <ProtectedAdmin>
+                  <AdminProductFormPage />
+                </ProtectedAdmin>
+              }
+            />
+            <Route
+              path="productForm/edit/:id"
+              element={
+                <ProtectedAdmin>
+                  <AdminProductFormPage />
+                </ProtectedAdmin>
+              }
+            />
+          </Route>
+          {/* ========================== */}
+          <Route path="/demo" element={<Demo />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

@@ -10,7 +10,7 @@ const authenticateUser = (req, res, next) => {
   try {
       const {name,userId,role} =  isTokenValid({ token });
       req.user = {name , userId , role }
-      console.log(req.user);
+      console.log("Checking req.user: ::::",req.user);
     //   console.log("in authenticateUser",req.user);
   } catch (error) {
       throw new CustomError.UnauthenticatedError("Token Not Valid");
@@ -19,20 +19,20 @@ const authenticateUser = (req, res, next) => {
 };
 
 const authorizePermissions = (...roles) =>{
-    // console.log("in authorizePermissions",roles);
-    
+    console.log("in authorizePermissions",roles);
     return (req,res,next) =>{
-        // console.log(roles);
+      const userRole = req.user.role;
+      
+      const findIndex = roles.findIndex((role)=> (role === userRole));
+      console.log(findIndex," ");
+      if( findIndex == -1 ){
+          throw new CustomError.UnauthorizedError(`Unauthorized to Access this route`);
+      } 
+      return next();
+        // // console.log(roles);
         
-        const userRole = req.user.role;
         
-        const findIndex = roles.findIndex((role)=> (role === userRole));
-        console.log(findIndex," ");
-        
-        if( findIndex == -1 ){
-            throw new CustomError.UnauthorizedError(`Unauthorized to Access this route`);
-        } 
-        next();
+        // next();
     }
 }
 const authorizeProduct = (req,res,next) =>{

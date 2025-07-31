@@ -4,6 +4,7 @@ import {
   fetchAllOrdersAPI,
   updateOrderAPI,
   currentUserOrderAPI,
+  verifyOrderPaymentAPI
 } from "./OrderAPI";
 
 const initialState = {
@@ -54,6 +55,13 @@ export const updateOrderDetailsAsync = createAsyncThunk(
     // console.log(resp);
     return newOrder;
 })
+export const verifyOrderPaymentAsync = createAsyncThunk(
+  "order/verifyOrderPaymentDetails",
+  async (paymentDetails) => {
+    const resp = await verifyOrderPaymentAPI(paymentDetails);
+    return resp.data;
+  }
+);
 export const orderSlice = createSlice({
   name: "order",
   initialState,
@@ -86,7 +94,7 @@ export const orderSlice = createSlice({
     },
     resetCurrentOrder:(state,action) =>{
       state.currentOrder = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -152,6 +160,18 @@ export const orderSlice = createSlice({
         state.orders[index] = newOrder;
       })
       .addCase(updateOrderDetailsAsync.rejected, (state) => {
+        state.status = "rejected";
+      })
+      // ==============================================>
+      .addCase(verifyOrderPaymentAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(verifyOrderPaymentAsync.fulfilled, (state, action) => {
+        state.status = "idle";
+        const currOrder = action.payload;
+        state.currentOrder = currOrder;
+      })
+      .addCase(verifyOrderPaymentAsync.rejected, (state) => {
         state.status = "rejected";
       });
   },

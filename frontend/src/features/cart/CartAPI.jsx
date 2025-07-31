@@ -25,13 +25,15 @@ const updateCartItem = async (updateInfo) => {
   // TODO : update : {userId:,productId:,quantity}
   // *** Update.id should be a string ...
   console.log("in Update Slice ", updateInfo);
+  let resp ;
   try {
-    const resp = await axios.patch(cartServerURL, updateInfo);
+    resp = await axios.patch(cartServerURL, updateInfo);
     console.log("done update :::::::", resp.data);
-    return { msg: "Product Updated Succesfully", success: true };
   } catch (error) {
     return { msg: error.response.payload.msg, success: false };
   }
+  console.log("Hey we are returning")
+  return { ...(resp.data), success: true };
 };
 
 // "http://localhost:5000/api/v1/cart/" + deleteId

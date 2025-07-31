@@ -7,10 +7,15 @@ import {
   deleteCompleteUserCart,
 } from "./CartAPI";
 
+import calculateProductCosting from "../../utils/calculateProductCosting";
 const initialState = {
   cart: [],
-  amount: 0,
-  totalItems: 0,
+  totalAmount: 0,
+  subTotal: 0,
+  totalTaxAmount: 0,
+  totalShippingAmount: 0,
+  totalItemsCnt:0,
+  totalQuantity:0,
   status: "idle",
 };
 
@@ -25,7 +30,7 @@ export const fetchUserItemsAsync = createAsyncThunk(
 export const addToCartAsync = createAsyncThunk(
   "cart/addToCartDetails",
   async (itemDetails) => {
-    console.log(itemDetails);
+    console.log("Add to Cart Details ::: ",itemDetails);
     return await addToCart(itemDetails);
   }
 );
@@ -35,41 +40,33 @@ export const updateCartItemAsync = createAsyncThunk(
   "cart/updateCartItemDetails",
   async (updateItem) => {
     console.log("check",updateItem);
-    const {product ,_id,...restInfo } = updateItem.item;
+    const {product ,_id , ...restInfo } = updateItem.item;
+    const { newQuantity } = updateItem;
+
+
     const resp = await updateCartItem({
       ...restInfo,
-      quantity: updateItem.newQuantity,
+      quantity:newQuantity,
       product: product.id,
     });
-    console.log(
-      updateItem.newQuantity,
-      " ",
-      updateItem.item.quantity,
-      "  ",
-      updateItem.item.price
-    );
-    const change = {
-      updatedCost: ((+updateItem.newQuantity) -( +updateItem.item.quantity)) *(+updateItem.item.product.price),
-      updatedItems: (+updateItem.newQuantity) - (+updateItem.item.quantity),
-      updatedQuantity: (updateItem.newQuantity),
-      id: updateItem.item.product.id,
-    };
-    return {...resp,...change};
+    console.log(resp);
+    
+    return resp;
   }
 );
 
 export const deleteCartItemAsync = createAsyncThunk(
   "cart/deleteCartItemDetails",
   async (item) => {
-    console.log("enterd deleting ",item);
-    const resp = await deleteCartItem(item.id);
-    console.log(resp);
+    console.log("enterd deleting in SLice :::, ",item);
+    const resp = await deleteCartItem(item.product.id);
+    console.log("Server gave response :::, ", resp);
     console.log({
         msg: "Delete Item Success",
         ...item,
         success: true,
     });
-    return { ...item , ...resp };
+    return { product:item , ...resp };
   }
 );
 
@@ -86,9 +83,13 @@ export const cartSlice = createSlice({
   reducers: {
     clearCart: (state) => {
       state.cart=[];
-      state.amount=0;
-      state.totalItems=0;
       state.status="idle";
+      state.totalAmount=0;
+      state.subTotal=  0;
+      state.totalTaxAmount= 0;
+      state.totalShippingAmount= 0;
+      state.totalItemsCnt=0;
+      state.totalQuantity=0;
     },
   },
   extraReducers: (builder) => {
@@ -98,13 +99,20 @@ export const cartSlice = createSlice({
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        console.log("adding your product", action.payload);
+        console.log("Fufilled Adding to Cart Your Product", action.payload);
         const { success } = action.payload;
         if (success) {
           const item = action.payload.product;
           state.cart.push(item);
-          state.amount = state.amount + +item.quantity * +item.product.price;
-          state.totalItems += +item.quantity;
+          state.subTotal = state.totalTaxAmount + item.itemSubTotal;
+          state.totalTaxAmount = state.totalTaxAmount + item.itemTaxAmount;
+          state.totalShippingAmount =
+            state.totalShippingAmount + item.itemShippingAmount;
+          state.totalAmount =
+            state.totalAmount +
+            (item.itemSubTotal + item.itemTaxAmount + item.itemShippingAmount);
+          state.totalItemsCnt = state.totalItemsCnt + 1;
+          state.totalQuantity = (state.totalQuantity )+ (+item.quantity);
         }
       })
       .addCase(addToCartAsync.rejected, (state) => {
@@ -118,15 +126,18 @@ export const cartSlice = createSlice({
         const { success } = action.payload;
         console.log("Check the cart", action.payload);
         if (success) {
+          const {totalAmount,subTotal,totalTaxAmount,totalShippingAmount} = action.payload.userCart;
           let items = action.payload.userCart.cart;
           state.cart = items;
-          state.amount = items.reduce((prev, item) => {
-            return prev + +item.quantity * +item.product.price;
-          }, 0);
-          state.totalItems = items.reduce(
+          state.totalAmount = totalAmount;
+          state.subTotal = subTotal;
+          state.totalTaxAmount = totalTaxAmount;
+          state.totalShippingAmount = totalShippingAmount;
+          state.totalQuantity = items.reduce(
             (prev, item) => prev + +item.quantity,
             0
           );
+          state.totalItemsCnt = items.length;
         }
         state.status = "idle";
       })
@@ -137,20 +148,34 @@ export const cartSlice = createSlice({
       })
       .addCase(updateCartItemAsync.fulfilled, (state, action) => {
         state.status = "idle";
-        console.log(action.payload);
+        console.log("Here is the action.payload ", action.payload);
         console.log(state.cart);
         const { success } = action.payload;
+        
         if (success) {
-          const { id, updatedItems, updatedCost, updatedQuantity } =
-            action.payload;
-          state.amount += updatedCost;
-          state.totalItems += updatedItems;
-
-          const index = state.cart.findIndex((item) => {
-            return item.product.id === id;
+          const {
+            item,
+            quantity,
+            delShippingAmount,
+            delSubTotal,
+            delTaxAmount,
+          } = action.payload;
+          state.subTotal = state.subTotal + delSubTotal;
+          state.totalTaxAmount = state.totalTaxAmount + delTaxAmount;
+          state.totalShippingAmount =
+            state.totalShippingAmount + delShippingAmount;
+          state.totalAmount =
+            state.totalAmount + delSubTotal + delTaxAmount + delShippingAmount;
+          state.totalQuantity = quantity;
+        
+          const index = state.cart.findIndex((currItem) => {
+            return currItem.product.id === item.product.id;
           });
-          state.cart[index].quantity = updatedQuantity;
+          state.cart[index] = item;
         }
+      })
+      .addCase(updateCartItemAsync.rejected, (state) => {
+        state.status = "idle";
       })
       // * delte Cart Item ===================>
       .addCase(deleteCartItemAsync.pending, (state) => {
@@ -158,12 +183,24 @@ export const cartSlice = createSlice({
       })
       .addCase(deleteCartItemAsync.fulfilled, (state, action) => {
         console.log("delete payload: ", action.payload);
-        const { updateByAmount, updateByItem, id, success } = action.payload;
+        const {  success } = action.payload;
         if (success) {
-          state.amount += updateByAmount;
-          state.totalItems += updateByItem;
-
-          const index = state.cart.findIndex((item) => item.product.id === id);
+          const {itemSubTotal,itemTaxAmount,itemShippingAmount,quantity} = action.payload.product;
+          const {id} = action.payload.product.product;
+          console.log({
+            itemSubTotal,
+            itemTaxAmount,
+            itemShippingAmount,
+            quantity,
+          }," ",state.totalAmount," ",state.subTotal," ",state.totalTaxAmount," ",state.totalShippingAmount);
+          
+          state.totalAmount -= (itemSubTotal+itemTaxAmount + itemShippingAmount);
+          state.subTotal -=(itemSubTotal);
+          state.totalTaxAmount -= itemTaxAmount;
+          state.totalShippingAmount -= itemShippingAmount;
+          state.totalQuantity -= quantity;
+          state.totalItemsCnt--;
+          const index = state.cart.findIndex((item) => (item.product.id === id) );
           console.log("this is the index:", index);
           state.cart.splice(index, 1);
         }
@@ -181,8 +218,13 @@ export const cartSlice = createSlice({
         const { success } = action.payload;
         if (success) {
           state.cart = [];
-          state.amount = 0;
-          state.totalItems = 0;
+          state.status = "idle";
+          state.totalAmount = 0;
+          state.subTotal=0;
+          state.totalTaxAmount = 0;
+          state.totalShippingAmount = 0;
+          state.totalItemsCnt = 0;
+          state.totalQuantity = 0;
         }
         state.status = "idle";
       });

@@ -14,6 +14,7 @@ import {
   loggedInUserInfo,
   updateUserInfo,
   logOutUserInfo,
+  deleteUserAddress
 } from "./UserAPI";
 
 export const loggedInUserInfoAsync = createAsyncThunk(
@@ -38,6 +39,13 @@ export const updateUserInfoAsync = createAsyncThunk(
     return await updateUserInfo(userInfo);
   }
 );
+export const deleteUserAddressAsync = createAsyncThunk(
+  "auth/deleteUserAddressDetails",
+  async (addressId) => {
+    console.log("check Info ", addressId);
+    return await deleteUserAddress(addressId);
+  }
+);
 
 export const logoOutUserInfoAsync = createAsyncThunk(
   "auth/logoOutUserInfoDetails",
@@ -58,13 +66,13 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    // Orders ==================> 
+      // Orders ==================>
       .addCase(loggedInUserOrdersAsync.pending, (state) => {
         state.status = "loading";
       })
       .addCase(loggedInUserOrdersAsync.fulfilled, (state, action) => {
-        const { success, orders ,items } = action.payload;
-        console.log("Here are your orders",action.payload);
+        const { success, orders, items } = action.payload;
+        console.log("Here are your orders", action.payload);
         if (success) {
           state.userOrders = orders;
           state.userOrdersCount = items;
@@ -77,8 +85,8 @@ export const userSlice = createSlice({
       })
       .addCase(loggedInUserInfoAsync.fulfilled, (state, action) => {
         const { success } = action.payload;
-        console.log("here is the api response",action.payload);
-        
+        console.log("here is the api response", action.payload);
+
         if (success) {
           state.userInfo = action.payload.user;
         }
@@ -89,6 +97,18 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateUserInfoAsync.fulfilled, (state, action) => {
+        const { success, data } = action.payload;
+        if (success) {
+          console.log("data is ", data);
+          state.userInfo = data;
+        }
+        state.status = "idle";
+      })
+      // Delete User Address  ==========================>
+      .addCase(deleteUserAddressAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteUserAddressAsync.fulfilled, (state, action) => {
         const { success, data } = action.payload;
         if (success) {
           console.log("data is ", data);

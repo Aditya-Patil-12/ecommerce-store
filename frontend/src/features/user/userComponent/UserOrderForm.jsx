@@ -3,6 +3,7 @@ import { IoMdClose } from "react-icons/io";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useSelector,useDispatch } from "react-redux";
 import { updateUserInfoAsync } from "../../user/UserSlice";
+
 const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
     const userInfo = useSelector((state)=>state.user.userInfo);
     let editingAddress = null;
@@ -40,12 +41,13 @@ const UserOrderForm = ({ isAddressModalOpen, setIsAddressModalOpen }) => {
     };
   return (
     <div className="absolute w-full h-full  overflow-y-scroll border-8 z-10 bg-white">
+
       <div className="flex flex-row-reverse">
         <button
           type="button"
           className="bg-indigo-600 cursor-pointer px-2 py-2  text-white rounded"
           onClick={() => setIsAddressModalOpen(0)}
-        >
+          >
           <IoMdClose />
         </button>
       </div>

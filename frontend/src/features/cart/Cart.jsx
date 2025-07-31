@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { FaPlus,FaMinus } from "react-icons/fa6";
-import { MdDelete } from "react-icons/md";
-import { Link,Navigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
+import { Link,Navigate } from "react-router";
+
 import { updateCartItemAsync,deleteCartItemAsync } from "./CartSlice";
-import { toast } from 'react-toastify'
 import ModalContainer from "../../commonComponents/ModalPage";
 import RemoveProductNotification from "./cartComponents/RemoveProductNotification";
+
+import { toast } from 'react-toastify'
+import { FaPlus,FaMinus } from "react-icons/fa6";
 import { ThreeDots } from 'react-loader-spinner' 
+import { MdDelete } from "react-icons/md";
+
 export default function Cart() {
-  const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const totalItems = useSelector((state) => state.cart.totalItems);
+  const totalQuantity = useSelector((state)=>state.cart.totalQuantity)
+  const subTotal = useSelector((state) => state.cart.subTotal);
   const amount = useSelector((state) => state.cart.amount);
   const isCartFetched = useSelector((state)=>state.cart.status);
   const cart = useSelector((state)=>state.cart.cart);
+  const [open, setOpen] = useState(false);
   // console.log("*(*(*(*(*(*H",isCartFetched,"  ",products);
   const removeProductDispatcher = async (item) =>{
-    console.log(item);
-    await dispatch(deleteCartItemAsync({
-      id:(item.product.id) ,
-      updateByAmount: -((+item.quantity)*(+item.product.price)) ,
-      updateByItem:(-(+item.quantity))
-    }));
+    console.log("Recieved the item ::: ", item);
+    await dispatch(deleteCartItemAsync(item));
     toast.success(`${item?.product.title} Deleted Succesfully`);
   }
   const handleRemove = async (item)=>{
@@ -39,6 +39,8 @@ export default function Cart() {
     if( (value) == (item.quantity) ) return ;
     if( value == 0 ) handleRemove(item);
     else {
+      console.log(value);
+      
       await dispatch(updateCartItemAsync({item:item,newQuantity:(value)}));
     }
   };
@@ -98,7 +100,7 @@ export default function Cart() {
                   <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
                     <img
                       src={product.product?.thumbnail}
-                      alt={product.product.title}
+                      alt={product.product?.title}
                       className="size-full object-cover"
                     />
                   </div>
@@ -134,7 +136,10 @@ export default function Cart() {
                           type="button"
                           onClick={() =>
                             handleChange(
-                              Math.min(product.product.stock, product.quantity + 1),
+                              Math.min(
+                                product.product.stock,
+                                product.quantity + 1
+                              ),
                               product
                             )
                           }
@@ -165,11 +170,11 @@ export default function Cart() {
       <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
         <div className="flex justify-between  text-base font-medium text-gray-900">
           <p>Subtotal</p>
-          <p className="mx-2">$ {Math.round(amount * 100) / 100}</p>
+          <p className="mx-2">$ {Math.round(subTotal * 100) / 100}</p>
         </div>
         <div className="flex justify-between  text-base font-medium text-gray-900">
           <p>Total Items</p>
-          <p className="mx-2">{totalItems}</p>
+          <p className="mx-2">{totalQuantity}</p>
         </div>
         <p className="mt-0.5 text-sm text-gray-500">
           Shipping and taxes calculated at checkout.

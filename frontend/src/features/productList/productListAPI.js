@@ -12,6 +12,14 @@ async function singleProductAPI(id) {
     return { msg:error.response.payload.msg ,success:false };
   }
 }
+// async function multipleProductInfo(idS) {
+//   try {
+//     const response = await axios.post(productServerUrl+id,{idS});
+//     return { product:response.data,success:true };
+//   } catch (error) {
+//     return { msg:error.response.payload.msg ,success:false };
+//   }
+// }
 
 async function productsByFiltersAPI({filterQuery, sortQuery,page}) {
   // TODO : Multiple Values for a Filter

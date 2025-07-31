@@ -1,0 +1,50 @@
+.profileArea{
+    display: grid;
+    grid-template-columns: 1fr 10fr;
+
+    grid-template-areas:
+    "photo infoDisplay"
+    "optionDisplay infoDisplay"
+    "temp infoDisplay";
+}
+.profilePhotoArea{
+    grid-area:photo;
+    height: 100%;
+    width: 250px;
+}
+.infoDisplay{
+    grid-area:infoDisplay;
+}
+.optionDisplay{
+    grid-area:optionDisplay;
+}
+.contactUs{
+    grid-area: temp;
+}
+
+
+
+.profileContainer{
+    margin-top:2rem;
+    /* border: 1px solid red; */
+}
+.profileHeading{
+    width:90%;
+    margin:0 auto;
+}
+.profileBody{
+    width:90%;
+    margin:0 auto;
+    /* border:1px solid black; */
+    padding-left:3% ;
+}
+.childContainer{
+    padding: 20px 15px;
+    border:1px solid #808080;
+    margin-top: 20px;
+}
+
+
+.sectionBreak{
+    margin-bottom:80px;
+}

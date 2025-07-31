@@ -27,11 +27,27 @@ const loggedInUserOrders = async () => {
 
 const updateUserInfo = async (userInfo) => {
   let resp=null;
+  console.log(userInfo);
+  
   try {
     resp = await axios.patch(userServerURL + "/updateUser", userInfo);
+    console.log(resp);
+    
     console.log("Server Response ", resp.data);
   } catch (error) {
-    return { msg: "Update Address Failed", success: false };
+    return { msg: "Update/Addtion Address Failed", success: false };
+  }
+  return { data: resp.data, success: true };
+};
+const deleteUserAddress = async (addressId) => {
+  let resp=null;
+  console.log("Address to be deleted : ",addressId);
+  
+  try {
+    resp = await axios.delete(userServerURL + "/deleteUserAddress", {data : {addressId}});
+    console.log("Server response after deleting the Address : ", resp);
+  } catch (error) {
+    return { msg: "Deleting Address Failed", success: false };
   }
   return { data: resp.data, success: true };
 };
@@ -45,4 +61,10 @@ const logOutUserInfo = async () => {
   }
 };
 
-export { loggedInUserOrders, loggedInUserInfo, updateUserInfo, logOutUserInfo };
+export {
+  loggedInUserOrders,
+  loggedInUserInfo,
+  updateUserInfo,
+  logOutUserInfo,
+  deleteUserAddress,
+};

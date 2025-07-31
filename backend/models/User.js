@@ -2,6 +2,16 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require('bcrypt');
 const AddressSchema = require('./basic');
+const AddSchema = mongoose.Schema({
+  fullName: { type: String, required: true, default: "" },
+  email: { type: String, required: true, default: "" },
+  phoneNo: { type: String, required: true, default: "" },
+  streetAddress: { type: String, required: true, default: "" },
+  city: { type: String, required: true, default: "" },
+  postalCode: { type: String, required: true, default: "" },
+  region: { type: String, required: true, default: "" },
+  country: { type: String, required: true, default: "" },
+});
 const UserSchema = mongoose.Schema({
   name: {
     type: String,
@@ -30,10 +40,11 @@ const UserSchema = mongoose.Schema({
     default: "customer",
   },
   addresses: {
-    type: [AddressSchema],
+    type: [AddSchema],
     default: [],
   },
 });
+
 // pre -> hook 
 UserSchema.pre("save", async function () {
   // this -> point to userschema

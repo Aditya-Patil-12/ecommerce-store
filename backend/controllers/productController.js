@@ -18,6 +18,17 @@ const getSingleProduct = async (req, res) => {
   }
   return res.status(StatusCodes.OK).json(product);
 };
+// const getMultipleProduct = async (req, res) => {
+//   const { idS } = req.params;
+//   const product = await Product.findOne({ _id: id }).populate('reviews');
+//   if (!product) {
+//     throw new CustomError.NotFoundError(
+//       "No Product Exists with this " + `${id}`
+//     );
+//   }
+//   return res.status(StatusCodes.OK).json(product);
+// };
+
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;

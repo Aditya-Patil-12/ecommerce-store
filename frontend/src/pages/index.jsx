@@ -8,6 +8,7 @@ import ProductDetailPage from "./ProductDetailPage";
 import ProductsPage from "./ProductsPage";
 import SignUpPage from "./SignUpPage";
 import UserOrdersPage from "./UserOrdersPage";
+import OrderTrackingPage from '../pages/OrderTrackingPage'
 import UserProfilePage from "./UserProfilePage";
 import HomePage from "./HomePage";
 import LogoutPage from "./LogoutPage";
@@ -35,6 +36,7 @@ export {
   // Order Page===========>
     OrderSuccessPage,
     UserOrdersPage,
+    OrderTrackingPage,
   // ===================?
   // Product Pages =======>
     ProductDetailPage,

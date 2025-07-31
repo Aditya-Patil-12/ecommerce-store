@@ -1,0 +1,14 @@
+
+.sectionBreak{
+    margin-bottom:80px;
+}
+.addressBtn{
+    cursor: pointer;
+    width: 100px;
+    height: 30px;
+    border-radius: 10%;
+    background: #bb86fc;
+    margin-top:2rem;
+    margin-left:1rem;
+    margin-right:1rem;
+}

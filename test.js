@@ -175,17 +175,63 @@
 
 // console.log(calculatePercentage(21,31));
 
-const filterQuery =  {"category":["smartphones","laptops"]};
-let queryString = "";
-for (let [key, value] of Object.entries(filterQuery)) {
-  if (value.length) {
-    let filterTypeValues = "";
-    for (let val of value) {
-      filterTypeValues += val + ",";
-    }
-    console.log(filterTypeValues);
-    filterTypeValues = filterTypeValues.slice(0,filterTypeValues.length-1);
-    queryString += key + "=" + filterTypeValues + "&";
+// const filterQuery =  {"category":["smartphones","laptops"]};
+// let queryString = "";
+// for (let [key, value] of Object.entries(filterQuery)) {
+//   if (value.length) {
+//     let filterTypeValues = "";
+//     for (let val of value) {
+//       filterTypeValues += val + ",";
+//     }
+//     console.log(filterTypeValues);
+//     filterTypeValues = filterTypeValues.slice(0,filterTypeValues.length-1);
+//     queryString += key + "=" + filterTypeValues + "&";
+//   }
+// }
+// console.log(queryString);
+
+
+
+
+// finalized the costing Startergy and add Subtotal , Tax , Shipping Calculation 
+
+
+async function print(i){
+  return new Promise((resolve,reject)=>{
+    setTimeout(()=>{
+      console.log(i);
+      resolve("done");
+    },i*1000);
+  });
+}
+
+async function helper(){
+  const n = 10;
+  for(let val=1;val<=n;val++){
+    await print(val);
   }
 }
-console.log(queryString);
+
+helper();
+
+
+// =============================================
+// Acc A => 50 =>  Acc B 
+/*
+1) Fetch Acc A Balance ( select ... )
+2) Fetch Acc B Balance ( select ... ) // Optional 
+
+3) Store Acc A balance + Acc B Balance ( select ... ) // Optional
+
+
+2) Check if A.balance < 50 then ( rollback() ) 
+
+3) A.balance -= 50 ( Update A.balance = A.balance - 50 )
+4) B.balance += 50  ( Update B.balance = B.balance + 50 )
+
+
+5) Refetch the Acc A and Acc B Balance 
+6) A.newbalance +B.newBalance != Stored Value; then Rollback
+
+7) Commit
+*/

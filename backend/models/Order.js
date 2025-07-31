@@ -28,8 +28,9 @@ const OrderSchema = mongoose.Schema(
       type: [
         {
           // price included tax Included ......
-          netAmount: { type: Number, default: 0 },
-          taxAmount: { type: Number, default: 0 },
+          itemSubTotal: { type: Number, default: 0 },
+          itemTaxAmount: { type: Number, default: 0 },
+          itemShippingAmount: { type: Number, default: 0 },
           quantity: { type: Number, required: true },
           product: {
             // title , thumbnail, quantity, price, discountPercentage , shippingAmount,
@@ -43,13 +44,18 @@ const OrderSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      values: ["Pending", "Dispatched", "Delivered", "Cancelled"],
+      values: ["Pending", "Shipped", "Delivered", "Shipped"],
       default: "Pending",
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    paymentState: {
+      type: String,
+      enum: ["created", "attempted", "captured"],
+      default: "created",
     },
     paymentType: {
       type: String,

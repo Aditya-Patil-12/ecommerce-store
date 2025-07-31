@@ -1,20 +1,31 @@
-const { StatusCodes } = require("http-status-codes");
+require("dotenv").config();
+const {
+  calculateDiscountedAmount,
+  calculateTotalOrderCosting,
+  calculatePercentageAmount,
+} = require("../utils");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const { clearCompleteCart } = require("../controllers/cartController");
 const CustomError = require("../errors");
+const { StatusCodes } = require("http-status-codes");
+const { clearCompleteCartHelper } = require("../controllers/cartController");
 const { checkPermissions } = require("../utils");
-// const { calculateDiscountedAmount } = require("../utils");
-// const {SelectedProduct} = require('../models/basic')
-const fakeStripeAPI = ({ amount, currency }) => {
-  const client_secret = "some Random Value";
-  return { client_secret, amount };
+const RazorPay = require("razorpay");
+const {
+  validateWebhookSignature,
+} = require("../node_modules/razorpay/dist/utils/razorpay-utils");
+
+const generateRazorPayInstance = () => {
+  console.log(process.env.PAYMENT_KEY_ID, " ", process.env.PAYMENT_KEY_SECRET);
+  const razorpayIntent = new RazorPay({
+    key_id: process.env.PAYMENT_KEY_ID,
+    key_secret: process.env.PAYMENT_KEY_SECRET,
+  });
+  return razorpayIntent;
 };
 
 const createOrder = async (req, res) => {
   const { userId } = req.user;
-  console.log(userId);
-  
   const {
     orderItems: cartItems,
     paymentType,
@@ -25,8 +36,8 @@ const createOrder = async (req, res) => {
     total,
   } = req.body;
 
-  console.log(req.body);
-  // 1) chek order items and place the order that's it .......
+  // console.log("Check the req.body : ", req.body);
+  // =====> 1) check cartItems and recalculate the total SubtTotal taxAmout and ShippingAmount ...
   if (!cartItems || cartItems.length == 0) {
     throw new CustomError.NotFoundError("Please select Products for Order");
   }
@@ -41,44 +52,136 @@ const createOrder = async (req, res) => {
   let orderItems = [];
   for (let cartProduct of cartItems) {
     const { quantity, product } = cartProduct;
-    console.log(quantity," ",product);
-    
+    // console.log(quantity," ",product);
+
     const dbProduct = await Product.findOne({ _id: product.id });
-    console.log(dbProduct);
+    // console.log(dbProduct);
 
     if (!dbProduct || !dbProduct.featured) {
       throw new CustomError.NotFoundError(
         `No Product Found with id ${cartProduct.product.id}`
       );
     }
-    orderItems.push({ quantity, product:cartProduct.product.id });    
+    const netAmount =
+      calculateDiscountedAmount(dbProduct.price, dbProduct.discountPercentage) *
+      quantity;
+    orderItems.push({
+      quantity,
+      netAmount,
+      shippingAmount: quantity * dbProduct.shippingAmount,
+      taxAmount: calculatePercentageAmount(netAmount, dbProduct.taxPercentage),
+      product: cartProduct.product.id,
+    });
   }
-  const order = await Order.create({
+
+  const { _total, _subTotal, _totalTaxAmount, _totalShippingAmount } =
+    calculateTotalOrderCosting(orderItems);
+
+  console.log(
+    _total,
+    " ",
+    _subTotal,
+    " ",
+    _totalTaxAmount,
+    " ",
+    _totalShippingAmount
+  );
+  console.log(
+    total,
+    " ",
+    subTotal,
+    " ",
+    totalTaxAmount,
+    " ",
+    totalShippingAmount
+  );
+
+  // if((totalTaxAmount !== _totalTaxAmount) ||
+  //   (totalShippingAmount !== _totalShippingAmount) ||
+  //   (subTotal !== _subTotal) ||
+  //   (total !== _total)  ){
+  //     throw new CustomError.BadRequestError("Invalid Product Request");
+  // }
+
+  // ====> 2) create a Order Intent with Razorpay....
+  const orderOptions = {
+    // amount x => x/100 rupees
+    amount: Math.floor(100 * 100),
+    currency: "INR",
+    receipt: "order_rcptid_11",
+  };
+
+  const razorPay = generateRazorPayInstance();
+  let orderIntentInfo = null;
+  await razorPay.orders.create(orderOptions, (err, order) => {
+    console.log(err);
+    if (err) {
+      orderIntentInfo = {
+        statusCode: err.statusCode,
+        msg: err.error.description,
+        error: true,
+      };
+      return;
+    }
+    orderIntentInfo = { order, error: false };
+    // we can directly return the res.json() from here only it works
+    return;
+  });
+  console.log("This is Razor Pay response ::: ", orderIntentInfo);
+  if (orderIntentInfo.error) {
+    return res
+      .status(orderIntentInfo.statusCode)
+      .json({ msg: orderIntentInfo.msg, success: false });
+  }
+  console.log(orderIntentInfo);
+
+  // ====>  4) Create the Order for your Server
+  let order = await Order.create({
     paymentType,
     user: userId,
+    paymentIntentId: orderIntentInfo.order.id,
+    clientSecret: process.env.PAYMENT_KEY_ID,
     orderItems,
     shippingAddress,
   });
 
-  // if(
-  //   (order.totalTaxAmount !== totalTaxAmount) ||
-  //   (order.totalShippingAmount !== totalShippingAmount) ||
-  //   (order.subTotal !== subTotal) ||
-  //   (order.total !== total)  ){
-  //     throw new CustomError.BadRequestError("Invalid Product Request");
-  // }
-  // 2) order succesfull delete user cart ...
-  // clearCompleteCart(req,res);
+  console.log("Created Order Object ::: ", order);
 
-  // 3) for all Products fetch user ke items 
-  for(let item of orderItems){
-    console.log(item.product);
-    const product = await Product.findOne({_id:item.product});
-    product.stock -= item.quantity;
-    await product.save();
-  }
   return res.status(StatusCodes.CREATED).json(order);
 };
+
+// webhook password ::: _92_hXKG9S8N2zt
+const verifyPayment = async (req, res) => {
+  const { order_id, payment_id, signature } = req.body;
+
+  const secret = process.env.PAYMENT_KEY_SECRET;
+
+  if (
+    validateWebhookSignature(order_id + "|" + payment_id, signature, secret)
+  ) {
+    // payment Successfull
+    const order = await Order.findOne({ paymentIntentId: order_id });
+    order.paymentState = "captured";
+    await order.save();
+    // 2) order succesfull delete user cart ...
+    clearCompleteCartHelper(req, res);
+
+    // 3) for all Products fetch user ke items
+    for (let item of order.orderItems) {
+      console.log(item.product);
+      const product = await Product.findOne({ _id: item.product });
+      product.stock -= item.quantity;
+      await product.save();
+    }
+    return res.status(200).json(order);
+  } else {
+    // payment Failed
+    return res
+      .status(400)
+      .json({ msg: "Payment not verified", success: false });
+  }
+};
+
 const currentUserOrders = async (req, res) => {
   const id = req.user.userId;
 
@@ -113,7 +216,9 @@ const updateOrder = async (req, res) => {
   const { id: orderId } = req.params;
   // const { paymentIntentId } = req.body;
   const { status } = req.body;
-  const order = await Order.findOneAndUpdate({ _id: orderId },{status});
+  console.log(orderId, " ", status);
+  
+  const order = await Order.findOneAndUpdate({ _id: orderId }, { status });
   if (!order) {
     throw new CustomError.NotFoundError("No Order Exists with this " + `${id}`);
   }
@@ -127,8 +232,27 @@ const updateOrder = async (req, res) => {
 // not publicly accessible for all
 const allOrders = async (req, res) => {
   console.log("hey there");
+  const query = req.query;
+  console.log(query);
+  const limitOrders = +req.query._per_page;
+  const page = +req.query._page;
   try {
-    const orders = await Order.find({});
+    const orders = await Order.find({}).skip((page-1)*(limitOrders)).limit(limitOrders);
+    if( req.query._sort  ){
+      orders.sort((order1,order2)=>{
+        let isDescending = req.query._sort.startsWith("-");
+        let sortField = isDescending
+        ? req.query._sort.slice(1)
+        : req.query._sort;
+        if (isDescending) {
+          return order2[sortField] - order1[sortField]; 
+        } else {
+          return order1[sortField] - order2[sortField]; 
+        }
+      })
+    } 
+    
+        console.log(page," ",limitOrders ,orders);
     const items = orders.length;
     res.status(200).json({ data: orders, items: items });
   } catch (err) {
@@ -141,6 +265,5 @@ module.exports = {
   singleOrder,
   updateOrder,
   currentUserOrders,
+  verifyPayment,
 };
-
-

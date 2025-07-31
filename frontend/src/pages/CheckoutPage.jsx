@@ -6,6 +6,8 @@ import { Link, Navigate, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { updateUserInfoAsync } from "../features/user/UserSlice";
+import { resetCurrentOrder } from "../features/order/OrderSlice";
+import { verifyOrderPaymentAsync } from "../features/order/OrderSlice";
 import {
   updateCartItemAsync,
   deleteCartItemAsync,
@@ -14,6 +16,16 @@ import {
   createOrderAsync,
 } from "../features/order/OrderSlice";
 
+const loadRazorpayScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    // script.src = src --> this can load any type of script 
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 export default function CheckOutPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,11 +36,11 @@ export default function CheckOutPage() {
   const {addresses} = useSelector((state) => state.user.userInfo);
 
   // Cart Variables .....
-  const amount = useSelector((state) => state.cart.amount);
+  const amount = useSelector((state) => state.cart.totalAmount);
   const isCartFetched = useSelector((state) => state.cart.status);
   const products = useSelector((state) => state.cart.cart);
-  const totalItems = useSelector((state) => state.cart.totalItems);
-
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
+  const cart = useSelector((state)=>state.cart);  
   // order Variables ....
   const currentOrder = useSelector((state) => state.order.currentOrder);
 
@@ -36,8 +48,13 @@ export default function CheckOutPage() {
   // useState .......
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const [paymentDetails,setPaymentDetails] = useState({
+    order_id:"",
+    payment_id:"",
+    signature:"",
+  });
 
-
+  const [successfullOrderId,setSuccessfullOrderId] = useState(-1);
 
   // Remove Cart Product
   const handleRemove = async (item) => {
@@ -85,20 +102,83 @@ export default function CheckOutPage() {
       }
       return ;
     }
+    // ready for payment
+    // 1) Load the Script ... generally fetched in App. s
+    const isScriptLoaded = await loadRazorpayScript();
+    if( !isScriptLoaded ){
+      toast.error('RazorPay SDK is Failed');
+      return ;
+    }
         // we have to place the order ....
-        await dispatch(
-          createOrderAsync({
-            totalTaxAmount: 0,
-            totalShippingAmount: 0,
-            subTotal: 0,
-            total: 0,
-            user: userId,
-            paymentType: paymentMethod,
-            orderItems: products,
-            shippingAddress: selectedAddress,
-            status: "pending",
-          })
-        );
+    let orderIntentDetails = await dispatch(
+      createOrderAsync({
+        totalTaxAmount: 0,
+        totalShippingAmount: 0,
+        subTotal: 0,
+        total: Math.round(amount * 100) / 100,
+        user: userId,
+        paymentType: paymentMethod,
+        orderItems: products,
+        shippingAddress: selectedAddress,
+        status: "pending",
+      })
+    );
+    console.log(orderIntentDetails);
+    orderIntentDetails = orderIntentDetails.payload;
+    if( orderIntentDetails.success ){
+      orderIntentDetails = orderIntentDetails.data;
+      console.log(orderIntentDetails);
+      
+      const options = {
+        key: orderIntentDetails.clientSecret,
+        amount: orderIntentDetails.total,
+        currency: "INR",
+        name: "Ecommerce Store",
+        description: "",
+        image:
+          "https://tse4.mm.bing.net/th/id/OIP._mKN-XWUleASlO4pPHqXeQHaD3?cb=iwc2&rs=1&pid=ImgDetMain",
+        order_id: orderIntentDetails.paymentIntentId,
+        handler: function (response) {
+          console.log(
+            orderIntentDetails._id,
+            " ",
+            response.razorpay_payment_id,
+            " ",
+            response.razorpay_order_id,
+            " ",
+            response.razorpay_signature
+          );
+          
+          setPaymentDetails({
+            id: orderIntentDetails._id,
+            payment_id: response.razorpay_payment_id,
+            order_id: response.razorpay_order_id,
+            signature:response.razorpay_signature,
+          });
+        },
+        // callback_url: `https://ad8e-183-87-254-149.ngrok-free.app/order-success/${orderIntentDetails._id}`,
+        // callback_url: `http://localhost:5000/api/v1/orders/verifyOrderPayment`,
+        // callback_url: `https://8384-183-87-254-149.ngrok-free.app/api/v1/orders/verifyOrderPayment`,
+        prefill: {
+          name: "Gaurav Kumar",
+          email: "gaurav.kumar@example.com",
+          contact: "9000090000",
+        },
+        notes: {
+          address: "Razorpay Corporate Office",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } 
+    else{
+      toast.error("Payment Intent Failed");
+      return ;
+    }
 
         // products: products,
         // totalAmount: amount,
@@ -106,12 +186,29 @@ export default function CheckOutPage() {
 
         // TODO : redirection to order Page, stock of current product changes , clear cart items
   };
+  useEffect(() => {
+    if (currentOrder != -1) {
+      dispatch(resetCurrentOrder(null));
+    }
+  }, []);
   // use Navigate works now if not will use Naivgate 
   useEffect(()=>{
-    if( currentOrder ){
-      navigate(`/order-success/${currentOrder}`,{replace :true}); 
+    if( paymentDetails?.order_id && paymentDetails?.payment_id  && paymentDetails?.signature  ){
+      // we have got the required thing now lets go to order Success Page
+      const callback = async ()=>{
+        const {order_id,payment_id,signature} = paymentDetails;
+        await dispatch(verifyOrderPaymentAsync({ order_id, payment_id, signature }));
+        setSuccessfullOrderId(paymentDetails.id);
+      }
+      callback();
     }
-  },[currentOrder,navigate])
+  },[paymentDetails]);
+  useEffect(() => {
+    if (successfullOrderId != -1) {
+      console.log("Current Order is set ok");
+      navigate(`/order-success/${successfullOrderId}`, { replace: true });
+    }
+  }, [successfullOrderId]);
   // NOTE :
   //
   // if( currentOrder ){
@@ -143,7 +240,7 @@ export default function CheckOutPage() {
                     Personal Information
                   </h2>
                   <p className="mt-1 text-sm/6 text-gray-600">
-                    Use a permanent address where you can receive mail.
+                    Use a permanent address where you can receive product.
                   </p>
 
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -314,7 +411,7 @@ export default function CheckOutPage() {
                     type="submit"
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
-                    Save Order Information
+                    Save Addresss Information
                   </button>
                 </div>
               </div>
