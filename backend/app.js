@@ -123,29 +123,29 @@ app.use(notFoundMiddleWare);
 // error HandleMiddleWare() will handle It
 app.use(errorHandlerMiddleware);
 
-const act = async () => {
-  setTimeout(async () => {
-    const finalProducts = [];
-    for(let product of data){
-      const {title,price,description,discountPercentage,stock,category,warrantyInformation,thumbnail,returnPolicy,images} = product;
-      if( !images ) images = [];
-      finalProducts.push({
-        title,
-        price: Math.max(1, price),
-        description,
-        discountPercentage,
-        stock,
-        category,
-        warrantyInformation,
-        thumbnail,
-        returnPolicy,
-        user: "67dd87c95e6c5ff6dbcdaa36",
-        images,
-      });
-    }
-  // Product.insertMany(finalProducts);
-  }, 2000);
-};
+// const act = async () => {
+//   setTimeout(async () => {
+//     const finalProducts = [];
+//     for(let product of data){
+//       const {title,price,description,discountPercentage,stock,category,warrantyInformation,thumbnail,returnPolicy,images} = product;
+//       if( !images ) images = [];
+//       finalProducts.push({
+//         title,
+//         price: Math.max(1, price),
+//         description,
+//         discountPercentage,
+//         stock,
+//         category,
+//         warrantyInformation,
+//         thumbnail,
+//         returnPolicy,
+//         user: "67dd87c95e6c5ff6dbcdaa36",
+//         images,
+//       });
+//     }
+//   // Product.insertMany(finalProducts);
+//   }, 2000);
+// };
 
 const port = process.env.PORT || 5000;
 const start = async () => {
