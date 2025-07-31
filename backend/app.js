@@ -1,4 +1,3 @@
-// require() ...
 require("dotenv").config();
 require("express-async-errors");
 
@@ -29,11 +28,7 @@ const reviewRouter = require("./routes/reviewRouter");
 const orderRouter = require('./routes/orderRouter');
 
 
-// const { addCategoryDB } = require("./controllers/categoryController");
-// const singleAct = require("./addData");
-// const User = require("./models/User");
-// const data = require('./data/products') ; 
-const Product = require("./models/Product");
+
 
 
 // MiddleWares Imports  ===========>
@@ -57,9 +52,10 @@ const { loginController } = require("./controllers/authController");
 //   console.log(req.headers);
 //   next();
 // })
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://ecommerce-store-full.netlify.app/",
     credentials: true,
   })
 );
@@ -88,22 +84,7 @@ app.post("/api/v1", (req, res) => {
   res.json({ success: true });
 });
 
-app.post("/api/v1/verifyPay",(req,res)=>{
-  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
-    req.body;
 
-  // Do signature verification...
-
-  // After verifying, store info in DB or session
-  // Then redirect user
-  console.log("Post was here");
-  
-  res.redirect(`http://localhost:5173/order-success/${razorpay_order_id}`);
-});
-app.get('/api/v1/verifyPay',(req,res)=>{
-  console.log("Get was here");
-  res.redirect(`http://localhost:5173/order-success/${123}`);
-});
 // use Routers =================>
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
@@ -123,35 +104,13 @@ app.use(notFoundMiddleWare);
 // error HandleMiddleWare() will handle It
 app.use(errorHandlerMiddleware);
 
-// const act = async () => {
-//   setTimeout(async () => {
-//     const finalProducts = [];
-//     for(let product of data){
-//       const {title,price,description,discountPercentage,stock,category,warrantyInformation,thumbnail,returnPolicy,images} = product;
-//       if( !images ) images = [];
-//       finalProducts.push({
-//         title,
-//         price: Math.max(1, price),
-//         description,
-//         discountPercentage,
-//         stock,
-//         category,
-//         warrantyInformation,
-//         thumbnail,
-//         returnPolicy,
-//         user: "67dd87c95e6c5ff6dbcdaa36",
-//         images,
-//       });
-//     }
-//   // Product.insertMany(finalProducts);
-//   }, 2000);
-// };
+
 
 const port = process.env.PORT || 5000;
 const start = async () => {
   try {
 
-    console.log(port);
+    // console.log(port);
     await connectDB(process.env.MONGO_URI);
     console.log("Database Connected ......")
     await app.listen(port, () => {
@@ -165,4 +124,3 @@ const start = async () => {
 
 start();
 
-// require('./test.js')
