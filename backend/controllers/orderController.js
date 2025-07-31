@@ -77,7 +77,7 @@ const createOrder = async (req, res) => {
   const { _total, _subTotal, _totalTaxAmount, _totalShippingAmount } =
     calculateTotalOrderCosting(orderItems);
 
-  console.log(
+  console.log("Original Matter \n",
     _total,
     " ",
     _subTotal,
@@ -106,7 +106,7 @@ const createOrder = async (req, res) => {
   // ====> 2) create a Order Intent with Razorpay....
   const orderOptions = {
     // amount x => x/100 rupees
-    amount: Math.floor(100 * 100),
+    amount: Math.floor(total * 100),
     currency: "INR",
     receipt: "order_rcptid_11",
   };
@@ -167,12 +167,12 @@ const verifyPayment = async (req, res) => {
     clearCompleteCartHelper(req, res);
 
     // 3) for all Products fetch user ke items
-    for (let item of order.orderItems) {
-      console.log(item.product);
-      const product = await Product.findOne({ _id: item.product });
-      product.stock -= item.quantity;
-      await product.save();
-    }
+    // for (let item of order.orderItems) {
+    //   console.log(item.product);
+    //   const product = await Product.findOne({ _id: item.product });
+    //   product.stock -= item.quantity;
+    //   await product.save();
+    // }
     return res.status(200).json(order);
   } else {
     // payment Failed

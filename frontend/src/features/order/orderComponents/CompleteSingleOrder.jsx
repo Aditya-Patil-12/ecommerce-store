@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from 'react'
 import OrderProduct from './OrderProduct';
+import { useSelector } from 'react-redux';
 const calAmount = (price) => {
   return Math.round(price * 100) / 100;
 };
@@ -70,53 +71,56 @@ const ProgressBar = ({status}) => {
     </div>
   );
 };
-const CompleteSingleOrder = ({}) => {
-    // console.log(order);
-    const orderId = "67189267dsfa7863214";
-    const orderPlacedDate = "27 Jul 2025";
-    const order = { 
-        paymentIntentId: 
-        "order_QfB2yo5LO2pgHj",
-        paymentState: 
-        "created",
-        paymentType: 
-        "card",
-        orderItems : [{
-      netAmount: 264.59999999999997,
-      quantity: 14,
-      taxAmount: 47.63,
-      _id: "6847175c103028f3f3632f96",
-      product:{
-        discountPercentage: 5.5,
-        id: "67ed3db46cfe18b6a675b797",
-        price: 19.99,
-        shippingAmount: 0,
-        taxPercentage: 18,
-        thumbnail: "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png",
-        title:"Eyeshadow Palette with Mirror",
-      }
-        }],
-        status: "Pending",
-        subTotal: 264.59999999999997,
-        total: 312.22999999999996,
-        totalShippingAmount: 0,
-        totalTaxAmount: 47.63,
-        updatedAt: "2025-06-09T17:18:21.003Z",
-        user: "6841d74b42c8862e907ce97e",
-        __v: 0,
-        _id: "6847175c103028f3f3632f95",
-        shippingAddress:{
-            city: "Mumbai",
-            country: "India",
-            email : "aditypatil71@gmail.com",
-            fullName : "Aditya Patil",
-            phoneNo : "+919326573816",
-            postalCode : "400068",
-            region : "Maharashtra",
-            streetAddress : "A/31 PAVITRA OVARIPADA DAHISAR",
-            _id : "6841d77b42c8862e907ce98c",
-        }
-    };
+const CompleteSingleOrder = ({  }) => {
+  // console.log(order);
+  const order = useSelector((state) => state.order.currentOrder);
+  const orderId = "67189267dsfa7863214";
+  const orderPlacedDate = "27 Jul 2025";
+  // const order = {
+  //   paymentIntentId: "order_QfB2yo5LO2pgHj",
+  //   paymentState: "created",
+  //   paymentType: "card",
+  //   orderItems: [
+  //     {
+  //       netAmount: 264.59999999999997,
+  //       quantity: 14,
+  //       taxAmount: 47.63,
+  //       _id: "6847175c103028f3f3632f96",
+  //       product: {
+  //         discountPercentage: 5.5,
+  //         id: "67ed3db46cfe18b6a675b797",
+  //         price: 19.99,
+  //         shippingAmount: 0,
+  //         taxPercentage: 18,
+  //         thumbnail:
+  //           "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png",
+  //         title: "Eyeshadow Palette with Mirror",
+  //       },
+  //     },
+  //   ],
+  //   status: "Pending",
+  //   subTotal: 264.59999999999997,
+  //   total: 312.22999999999996,
+  //   totalShippingAmount: 0,
+  //   totalTaxAmount: 47.63,
+  //   updatedAt: "2025-06-09T17:18:21.003Z",
+  //   user: "6841d74b42c8862e907ce97e",
+  //   __v: 0,
+  //   _id: "6847175c103028f3f3632f95",
+  //   shippingAddress: {
+  //     city: "Mumbai",
+  //     country: "India",
+  //     email: "aditypatil71@gmail.com",
+  //     fullName: "Aditya Patil",
+  //     phoneNo: "+919326573816",
+  //     postalCode: "400068",
+  //     region: "Maharashtra",
+  //     streetAddress: "A/31 PAVITRA OVARIPADA DAHISAR",
+  //     _id: "6841d77b42c8862e907ce98c",
+  //   },
+  // };
+  console.log("The current Order :::::",order);
+  
   return (
     <div className="mx-auto max-w-7xl ">
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1">
@@ -213,6 +217,6 @@ const CompleteSingleOrder = ({}) => {
       </div>
     </div>
   );
-}
+};
 
 export default CompleteSingleOrder

@@ -2,14 +2,18 @@
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Link } from "react-router";
 import {useState} from 'react'
+import { resetCurrentOrder } from "./OrderSlice";
+import { useDispatch } from "react-redux";
 // TODO : 
 // Simple Order Page with Detail Summary of A Given Order  
 const calAmount = (price) => {
   return Math.round(price * 100) / 100;
 };
+
 const SingleOrder = ({ order }) => {
+  const dispatch = useDispatch();
     const [isInvoice,setIsInvoice] = useState(false);
-    console.log(order);
+    console.log("This is the order::: ",order);
     
   return (
     <div className="mt-10 flex  flex-col bg-white shadow-xl">
@@ -61,6 +65,11 @@ const SingleOrder = ({ order }) => {
                         <Link
                         to={"/singleOrder/" + order._id}
                         className="block"
+                        onClick={
+                           () =>{
+                            dispatch(resetCurrentOrder(order));
+                          }
+                        }
                         >
                         Track Order
                         </Link>

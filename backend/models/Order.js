@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { AddressSchema } = require("./basic");
-const { calculateDiscountedAmount } = require("../utils");
+const { calculateDiscountedAmount,calculatePercentageAmount } = require("../utils");
 const OrderSchema = mongoose.Schema(
   {
     // default
@@ -91,22 +91,33 @@ OrderSchema.pre("save", async function (next) {
 });
 OrderSchema.pre("save", async function (next) {
   // update the indiviuval netAmount Tax Amount
-  this.orderItems.forEach((item) => {
-    item.netAmount =
-      calculateDiscountedAmount(
-        +item.product.price,
-        +item.product.discountPercentage
-      ) * +item.quantity;
-    item.taxAmount = calculateDiscountedAmount(
-      +item.netAmount,
-      100 - (+item.product.taxPercentage)
-    );
-    this.totalTaxAmount += item.taxAmount;
-    this.totalShippingAmount += item.shippingAmount;
-    this.subTotal += item.netAmount;
-  });
-  this.total +=
-    this.totalShippingAmount + this.totalTaxAmount + this.subTotal;
+  console.log("Please see I am saving  Updating Pre");
+  let fsub = 0,ftax=0,fship=0,ftotal=0;
+    this.orderItems.forEach((item, index) => {
+      let subtotal =
+          calculateDiscountedAmount(
+            +item.product.price,
+            +item.product.discountPercentage
+          ) * +item.quantity,
+        tax = calculatePercentageAmount(subtotal, +item.product.taxPercentage),
+        ship = +item.quantity * item.product.shippingAmount;
+
+      this.orderItems[index].itemSubTotal = subtotal;
+      this.orderItems[index].itemTaxAmount =tax;
+      this.orderItems[index].itemShippingAmount =ship;
+
+      ftax += tax;
+      fship += ship;
+      fsub += subtotal;
+      ftotal += tax + ship + subtotal;
+    });
+    this.totalTaxAmount = ftax;
+    this.totalShippingAmount = fship;
+    this.subTotal = fsub;
+    this.total = ftotal;
+    console.log("This the transformation orderItems ", this.orderItems);
+  console.log(this.totalShippingAmount, " ", this.totalTaxAmount ," ",this.subTotal," ",this.total);
+  console.log(this.orderItems);
   next();
 });
 module.exports = mongoose.model("Order", OrderSchema);
