@@ -55,7 +55,7 @@ const { loginController } = require("./controllers/authController");
 
 app.use(
   cors({
-    origin: "https://ecommerce-store-full.netlify.app/",
+    origin: "https://ecommerce-store-full.netlify.app",
     credentials: true,
   })
 );
