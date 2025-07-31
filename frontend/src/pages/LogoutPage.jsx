@@ -1,5 +1,4 @@
-import React from "react";
-import Logout from "../features/auth/authComponents/LogOut";
+import Logout from "../features/auth/authComponents/Logout";
 const LogoutPage = () => {
   return <Logout />;
 };
