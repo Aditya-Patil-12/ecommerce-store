@@ -1,3 +1,3 @@
 const productListLimit = 9;
-const baseServerURL = "http://localhost:5000/api/v1/";
+const baseServerURL = "https://ecommerce-store-tmqu.onrender.com/";
 export {productListLimit,baseServerURL};
