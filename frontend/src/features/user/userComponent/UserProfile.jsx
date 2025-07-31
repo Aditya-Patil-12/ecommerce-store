@@ -7,7 +7,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 import ProfileInfo from "./profileInfo/ProfileInfo";
 import { SiGmail } from "react-icons/si";
 import './userProfile.css';
-import UserAddress from "./Address/userAddress";
+import UserAddress from "./Address/UserAddress";
 import PaymentInfo from "./Payment/PaymentInfo";
 import { Link } from "react-router";
 const accountInfoOptions = [
