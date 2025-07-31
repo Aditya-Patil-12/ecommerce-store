@@ -106,7 +106,7 @@ const createOrder = async (req, res) => {
   // ====> 2) create a Order Intent with Razorpay....
   const orderOptions = {
     // amount x => x/100 rupees
-    amount: Math.floor(total * 100),
+    amount: Math.floor(_total * 100),
     currency: "INR",
     receipt: "order_rcptid_11",
   };
