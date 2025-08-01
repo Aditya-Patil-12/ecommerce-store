@@ -118,36 +118,54 @@ export default function Cart() {
                       </p>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
-                      <div className="quantityChange w-17 flex justify-between">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleChange(
-                              Math.max(0, product.quantity - 1),
-                              product
-                            )
-                          }
-                          className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
-                        >
-                          {product.quantity === 1 ? <MdDelete /> : <FaMinus />}
-                        </button>
-                        <p>{product.quantity}</p>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleChange(
-                              Math.min(
-                                product.product.stock,
-                                product.quantity + 1
-                              ),
-                              product
-                            )
-                          }
-                          className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
-                        >
-                          {" "}
-                          <FaPlus />{" "}
-                        </button>
+                      <div className="quantityChange w-17 border-1 max-w-[100px] grid grid-cols-3 justify-around">
+                        <div className="self-center">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleChange(
+                                Math.max(0, product.quantity - 1),
+                                product
+                              )
+                            }
+                            className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                          >
+                            {product.quantity === 1 ? (
+                              <MdDelete />
+                            ) : (
+                              <FaMinus />
+                            )}
+                          </button>
+                        </div>
+                        <div className="text-center">
+                          <p>{product.quantity}</p>
+                        </div>
+                        <div className="self-center">
+                          {product.product.stock > product.quantity && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (
+                                  product.quantity + 1 ==
+                                  product.product.stock
+                                ) {
+                                  toast.warning("Maximum Quantity Reached");
+                                }
+                                handleChange(
+                                  Math.min(
+                                    product.product.stock,
+                                    product.quantity + 1
+                                  ),
+                                  product
+                                );
+                              }}
+                              className="border-1 border-gray-300 w-5 h-5 grid items-center justify-center  cursor-pointer"
+                            >
+                              {" "}
+                              <FaPlus />{" "}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="flex">
                         <button

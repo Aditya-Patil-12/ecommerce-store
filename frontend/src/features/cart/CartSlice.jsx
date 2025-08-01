@@ -142,7 +142,6 @@ export const cartSlice = createSlice({
         state.status = "idle";
       })
       // =====================================>
-
       .addCase(updateCartItemAsync.pending, (state) => {
         state.status = "loading";
       })
@@ -209,7 +208,7 @@ export const cartSlice = createSlice({
       .addCase(deleteCartItemAsync.rejected, (state) => {
         state.status = "idle";
       })
-      //* delete Complete Cart ==================?
+      //* delete Complete Cart ==================
       .addCase(deleteCompleteUserCartAsync.pending, (state) => {
         state.status = "loading";
       })

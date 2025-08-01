@@ -396,6 +396,14 @@ function DesktopComponent({
     if (options.order === "desc") value= "-" + value;
     dispatch(setSortQuery({ filterType: "_sort", value: value }));
   };
+  const handleClearFilter = () =>{
+    dispatch(setFilterQuery({category:"",brand:""}));
+  }
+  const handleClearSort = () =>{
+    console.log("In here calcualting");
+    
+    dispatch(setSortQuery({}));    
+  }
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* heading part  with sort and mobile...... */}
@@ -404,7 +412,7 @@ function DesktopComponent({
           All Products
         </h1>
 
-        <div className="flex items-center ">
+        <div className="flex items-center gap-x-2">
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -436,6 +444,45 @@ function DesktopComponent({
                     </p>
                   </MenuItem>
                 ))}
+              </div>
+            </MenuItems>
+          </Menu>
+          <Menu as="div" className="relative inline-block text-left">
+            <div>
+              <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                Clear
+                <ChevronDownIcon
+                  aria-hidden="true"
+                  className="-mr-1 ml-1 size-5 shrink-0 text-gray-400 group-hover:text-gray-500"
+                />
+              </MenuButton>
+            </div>
+
+            <MenuItems
+              transition
+              className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white ring-1 shadow-2xl ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+            >
+              <div className="py-1">
+                <MenuItem key={"filters"}>
+                  <p
+                    onClick={() => {console.log("Clear Filter Query"); handleClearFilter();}}
+                    className={classNames(
+                      "block px-4 py-2 text-sm data-focus:bg-gray-100 data-focus:outline-hidden"
+                    )}
+                  >
+                    {"Clear Filter"}
+                  </p>
+                </MenuItem>
+                <MenuItem key={"sort"}>
+                  <p
+                    onClick={() => {console.log("Clear Sort Query"); handleClearSort();}}
+                    className={classNames(
+                      "block px-4 py-2 text-sm data-focus:bg-gray-100 data-focus:outline-hidden"
+                    )}
+                  >
+                    {"Clear Sort"}
+                  </p>
+                </MenuItem>
               </div>
             </MenuItems>
           </Menu>
@@ -503,7 +550,13 @@ function DesktopComponent({
 
       {/* Section of Pagination */}
       <div className="ok">
-        <Pagination totalItems={totalItems} page={page} incrementPage={incrementPage} decrementPage={decrementPage} setPage={setPage} />
+        <Pagination
+          totalItems={totalItems}
+          page={page}
+          incrementPage={incrementPage}
+          decrementPage={decrementPage}
+          setPage={setPage}
+        />
       </div>
     </main>
   );

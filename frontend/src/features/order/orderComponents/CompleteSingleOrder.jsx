@@ -76,49 +76,6 @@ const CompleteSingleOrder = ({  }) => {
   const order = useSelector((state) => state.order.currentOrder);
   const orderId = "67189267dsfa7863214";
   const orderPlacedDate = "27 Jul 2025";
-  // const order = {
-  //   paymentIntentId: "order_QfB2yo5LO2pgHj",
-  //   paymentState: "created",
-  //   paymentType: "card",
-  //   orderItems: [
-  //     {
-  //       netAmount: 264.59999999999997,
-  //       quantity: 14,
-  //       taxAmount: 47.63,
-  //       _id: "6847175c103028f3f3632f96",
-  //       product: {
-  //         discountPercentage: 5.5,
-  //         id: "67ed3db46cfe18b6a675b797",
-  //         price: 19.99,
-  //         shippingAmount: 0,
-  //         taxPercentage: 18,
-  //         thumbnail:
-  //           "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png",
-  //         title: "Eyeshadow Palette with Mirror",
-  //       },
-  //     },
-  //   ],
-  //   status: "Pending",
-  //   subTotal: 264.59999999999997,
-  //   total: 312.22999999999996,
-  //   totalShippingAmount: 0,
-  //   totalTaxAmount: 47.63,
-  //   updatedAt: "2025-06-09T17:18:21.003Z",
-  //   user: "6841d74b42c8862e907ce97e",
-  //   __v: 0,
-  //   _id: "6847175c103028f3f3632f95",
-  //   shippingAddress: {
-  //     city: "Mumbai",
-  //     country: "India",
-  //     email: "aditypatil71@gmail.com",
-  //     fullName: "Aditya Patil",
-  //     phoneNo: "+919326573816",
-  //     postalCode: "400068",
-  //     region: "Maharashtra",
-  //     streetAddress: "A/31 PAVITRA OVARIPADA DAHISAR",
-  //     _id: "6841d77b42c8862e907ce98c",
-  //   },
-  // };
   console.log("The current Order :::::",order);
   
   return (
@@ -148,11 +105,13 @@ const CompleteSingleOrder = ({  }) => {
                 </div>
                 <div className="w-[200px] flex justify-center gap-x-2">
                   <h1 className="inline-block">Order Placed</h1>
-                  <p className="inline-block">{orderPlacedDate}</p>
+                  <p className="inline-block">{new Date(order.updatedAt).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="orderProgressBar">
-                <ProgressBar status={"Shipped"} />
+                <ProgressBar
+                  status={order.status == "Pending" ? "Order Placed" : ""}
+                />
               </div>
               <OrderProduct order={order} />
 

@@ -56,6 +56,7 @@ const { loginController } = require("./controllers/authController");
 app.use(
   cors({
     origin: "https://ecommerce-store-full.netlify.app",
+    // origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -68,13 +69,23 @@ app.use(express.static('./public'))
 app.use(fileUpload());
 
 
-// app.options((req,res)=>{
 
-// })
 // Routes are starting from here  ....
-app.get("/", (req, res) => {
-  res.json({ success: true });
-});
+// app.get("/api", async (req, res) => {
+//   console.log("Got the path")
+//   const data = await fetch(
+//     "https://dummyjson.com/products?limit=100&skip=0"
+//   );
+//   const products = await data.json();
+//   console.log(products);
+//   // for(let product of products.products){
+//   //   let serverProduct = await Product.findOne({title:product.title});
+//   //   console.log(serverProduct.title," ",product.title);
+//   //   serverProduct.brand = product.brand;
+//   //   await serverProduct.save();
+//   // }
+//   return res.json({ products,success: true });
+// });
 app.post("/api/v1", (req, res) => {
   console.log(req.body);
   

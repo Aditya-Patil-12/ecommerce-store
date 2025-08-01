@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
+import calculateDiscountedAmount from "../../../utils/calculateDiscountedAmount";
 const ProductsComponent = ({products}) => {
   // console.log("give me", products);
   
@@ -18,7 +19,7 @@ const ProductsComponent = ({products}) => {
 
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
           {products.map((product) => (
-            <Link to={"/product-detail"+`/${product.id}`} key={product.id}>
+            <Link to={"/product-detail" + `/${product.id}`} key={product.id}>
               <div key={product.id} className="group relative">
                 <div>
                   <img
@@ -27,21 +28,31 @@ const ProductsComponent = ({products}) => {
                     className="aspect-square w-full h-full block rounded-md bg-gray-200  group-hover:opacity-75 lg:aspect-auto lg:h-80"
                   />
                 </div>
-                <div className="mt-4 flex justify-between">
-                  <div>
-                    <h3 className="text-sm text-gray-700">
-                      {/* <a href={product.href}>
-                        <span aria-hidden="true" className="absolute inset-0" /> */}
-                      {product.name}
-                      {/* </a> */}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {product.category}
+                <div className="mt-4 flex flex-col justify-between">
+                  <div className="flex justify-between w-full">
+                    <div className="">
+                      <h3 className="text-sm text-gray-700">
+                        {/* <a href={product.href}>
+                          <span aria-hidden="true" className="absolute inset-0" /> */}
+                        {product.name}
+                        {/* </a> */}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {product.category}
+                      </p>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 line-through">
+                      ${product.price}
                     </p>
                   </div>
-                  <p className="text-sm font-medium text-gray-900">
-                    ${product.price}
-                  </p>
+                  <div className="w-full flex justify-between">
+                    <p className="mt-1 text-sm text-gray-500">
+                      Flat {product.discountPercentage} %
+                    </p>
+                    <p className="text-sm font-medium text-gray-900">
+                      ${calculateDiscountedAmount(product.price,product.discountPercentage)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </Link>

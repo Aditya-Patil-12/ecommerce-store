@@ -36,11 +36,13 @@ export default function CheckOutPage() {
   const {addresses} = useSelector((state) => state.user.userInfo);
 
   // Cart Variables .....
-  const amount = useSelector((state) => state.cart.totalAmount);
-  const isCartFetched = useSelector((state) => state.cart.status);
-  const products = useSelector((state) => state.cart.cart);
+  const total = useSelector((state) => state.cart.totalAmount);
+  const subTotal = useSelector((state) => state.cart.subTotal);
+  const totalTaxAmount = useSelector((state) => state.cart.totalTaxAmount);
+  const totalShippingAmount = useSelector((state) => state.cart.totalShippingAmount);
   const totalQuantity = useSelector((state) => state.cart.totalQuantity);
-  const cart = useSelector((state)=>state.cart);  
+  const isCartFetched = useSelector((state) => state.cart.status);
+  const products = useSelector((state) => state.cart.cart); 
   // order Variables ....
   const currentOrder = useSelector((state) => state.order.currentOrder);
 
@@ -58,11 +60,7 @@ export default function CheckOutPage() {
 
   // Remove Cart Product
   const handleRemove = async (item) => {
-    await dispatch(deleteCartItemAsync({
-      id:(item.product.id) ,
-      updateByAmount: -((+item.quantity)*(+item.product.price)) ,
-      updateByItem:(-(+item.quantity))
-    }));
+    await dispatch(deleteCartItemAsync(item));
     toast.success(`${item?.product.title} Deleted Succesfully`);
   };
   // Incr / Decrement Product....
@@ -109,13 +107,13 @@ export default function CheckOutPage() {
       toast.error('RazorPay SDK is Failed');
       return ;
     }
-        // we have to place the order ....
+    // we have to place the order ....
     let orderIntentDetails = await dispatch(
       createOrderAsync({
-        totalTaxAmount: 0,
-        totalShippingAmount: 0,
-        subTotal: 0,
-        total: Math.round(amount * 100) / 100,
+        totalTaxAmount: totalTaxAmount,
+        totalShippingAmount: totalShippingAmount,
+        subTotal: subTotal,
+        total: Math.round(total * 100) / 100,
         user: userId,
         paymentType: paymentMethod,
         orderItems: products,
@@ -608,7 +606,19 @@ export default function CheckOutPage() {
               <div className="border-t border-gray-200 px-4 py-4 sm:px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Subtotal</p>
-                  <p>${Math.round(amount * 100) / 100}</p>
+                  <p>{Math.round(subTotal * 100) / 100}{" "}$</p>
+                </div>
+                <div className="flex justify-between text-base font-medium text-gray-900">
+                  <p>Total Tax </p>
+                  <p>{Math.round(totalTaxAmount * 100) / 100}{" "}$</p>
+                </div>
+                <div className="flex justify-between text-base font-medium text-gray-900">
+                  <p>Total Shipping </p>
+                  <p>{Math.round(totalShippingAmount * 100) / 100}{" "}$</p>
+                </div>
+                <div className="flex justify-between text-base font-medium text-gray-900">
+                  <p>Total</p>
+                  <p>{Math.round(total * 100) / 100}{" "}$</p>
                 </div>
 
                 <p className="mt-0.5 text-sm text-gray-500">
