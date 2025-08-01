@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 const calAmount = (price) => {
   return Math.round(price * 100) / 100;
 };
-const orderStatuses = ["Order Placed", "Processing","Shipped","Delivered"];
+const orderStatuses = ["Payment", "Pending","Shipped","Delivered"];
 const ProgressBar = ({status}) => {
     let limit =0;
     const [percentage, setPercentage] = useState(0);
@@ -49,22 +49,22 @@ const ProgressBar = ({status}) => {
       <div className="w-full">
         <div className="pl-[25%] inline-block">
           {/* <div className="absolute right-full"> */}
-            <h1>Order Placed</h1>
+          <h1>Payment</h1>
           {/* </div> */}
         </div>
         <div className="pl-[19%] inline-block">
           {/* <div className="absolute right-full"> */}
-            <h1>Processing</h1>
+          <h1>Pending</h1>
           {/* </div> */}
         </div>
         <div className="pl-[18%] inline-block">
           {/* <div className="absolute right-full"> */}
-            <h1>Shipped</h1>
+          <h1>Shipped</h1>
           {/* </div> */}
         </div>
         <div className="pl-[12%] inline-block">
           {/* <div className="absolute right-full"> */}
-            <h1>Delivered</h1>
+          <h1>Delivered</h1>
           {/* </div> */}
         </div>
       </div>
@@ -110,7 +110,7 @@ const CompleteSingleOrder = ({  }) => {
               </div>
               <div className="orderProgressBar">
                 <ProgressBar
-                  status={order.status == "Pending" ? "Order Placed" : ""}
+                  status={order.status}
                 />
               </div>
               <OrderProduct order={order} />

@@ -25,10 +25,12 @@ const currentUserOrderAPI = async () => {
     return { msg: error.response.data.msg, success: false };
   }
 };
-const fetchAllOrdersAPI = async ({page,orderSortQuery:sortQuery}) => {
+const fetchAllOrdersAPI = async ({page,orderSortQuery:sortQuery,orderId}) => {
   let queryString = "";
-  console.log(sortQuery);
-  
+  console.log(sortQuery," ",orderId);
+  if( orderId != "" ){
+    queryString+=`_id=${orderId}&`;
+  }
   let sortFilter = Object.entries(sortQuery);
   if (sortFilter.length != 0) {
     queryString += "_sort=";

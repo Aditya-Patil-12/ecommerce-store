@@ -36,8 +36,10 @@ const generateColor = (status) =>{
 };
 const AdminOrders = () => {
   const dispatch = useDispatch();
+  const [orderId,setOrderID] = useState("");
   const orders = useSelector((state) => state.order.orders);
-  console.log(orders);
+  const st = useSelector((state) => state.order);
+  console.log(orders," ",st);
 
   const page = useSelector((state) => state.order.ordersPage);
 
@@ -52,8 +54,8 @@ const AdminOrders = () => {
 
   useEffect(() => {
     console.log("inside use Effect");
-      dispatch(fetchAllOrdersAsync({page:page,orderSortQuery:orderSortQuery}));
-  },[page,orderSortQuery]);
+      dispatch(fetchAllOrdersAsync({page:page,orderSortQuery:orderSortQuery,orderId:orderId}));
+  },[page,orderSortQuery,orderId]);
   // console.log(status);
   console.log(orders);
 
@@ -63,7 +65,12 @@ const AdminOrders = () => {
     await dispatch(updateOrderDetailsAsync(newOrder));
     setEditableId(-1);
   }
+  const handleOrderIdChange = async (e)=>{
+    setOrderID(e.target.value);
+  }
+
   // console.log(orders);
+  // console.log(orderId);
   return (
     <>
       <div className="relative">
@@ -82,8 +89,28 @@ const AdminOrders = () => {
         ) : null}
       </div>
       {showOrder == -1 ? (
-        <div className="relative ">
-          <div className="mt-0 align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+        <div className="relative border-10 ">
+          <div
+            className="searchOrderIdContainer my-2 mx-auto w-2/3 p-2 h-[100px] bg-white rounded-md flex flex-col
+          items-center gap-y-2"
+          >
+            <h1 className="border-gray-300 text-left text-sm text-black-500 font-bold">
+              Please Enter the Order Id#{" "}
+            </h1>
+            <div className="mt-2">
+              <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+                <input
+                  id="title"
+                  name="title"
+                  type="text"
+                  value={orderId}
+                  onChange={(e) => handleOrderIdChange(e)}
+                  className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mt-0 align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg ">
             {status === "loading" ? (
               <div className="flex justify-center">
                 <ThreeDots
@@ -186,8 +213,7 @@ const AdminOrders = () => {
                               {order.orderItems.map((product) => (
                                 <p className="mx-2" key={product._id}>
                                   {/* {`product.title`} -  */}#
-                                  {product.quantity} - 
-                                  {/* ${order.total} */}
+                                  {product.quantity} -{/* ${order.total} */}
                                 </p>
                               ))}
                             </div>
@@ -232,10 +258,10 @@ const AdminOrders = () => {
                                 }
                                 defaultValue={order.status}
                               >
-                                <option value="pending">Pending</option>
-                                <option value="dispatched">Dispatched</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="canceled">Canceled</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Dispatched">Dispatched</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
                               </select>
                             ) : null}
                             {editableId !== index ? (

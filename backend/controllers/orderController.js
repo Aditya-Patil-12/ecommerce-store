@@ -229,15 +229,89 @@ const updateOrder = async (req, res) => {
   // await order.save();
   return res.status(StatusCodes.OK).json(order);
 };
-// not publicly accessible for all
+// not publically accessible for all
 const allOrders = async (req, res) => {
   console.log("hey there");
   const query = req.query;
   console.log(query);
   const limitOrders = +req.query._per_page;
   const page = +req.query._page;
+  const id = req.query._id;
+  console.log(id);
   try {
-    const orders = await Order.find({}).skip((page-1)*(limitOrders)).limit(limitOrders);
+    const orders = id
+      ? await Order.aggregate([
+          {
+            $match: {
+              $expr: {
+                $regexMatch: {
+                  input: { $toString: "$_id" },
+                  regex: `^${id}`,
+                },
+              },
+            },
+          },
+          {
+            $unwind: "$orderItems",
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "orderItems.product",
+              foreignField: "_id",
+              as: "orderItems.productDetails",
+            },
+          },
+          {
+            $unwind: "$orderItems.productDetails",
+          },
+          {
+            $group: {
+              _id: "$_id",
+              orderItems: {
+                $push: "$orderItems",
+              },
+              otherFields: { $first: "$$ROOT" }, 
+            },
+          },
+          {
+            $replaceRoot: {
+              newRoot: {
+                $mergeObjects: [
+                  "$otherFields",
+                  { orderItems: "$orderItems" },
+                ],
+              },
+            },
+          },
+          { $skip: (page - 1) * limitOrders },
+          { $limit: limitOrders },
+        ])
+      : (
+          await Order.find({})
+            .skip((page - 1) * limitOrders)
+            .limit(limitOrders).populate({
+          path: "orderItems.product",
+          select:"thumbnail title brand category price"
+        }));
+    console.log("Hey the orders are ::::",orders);
+
+    const totalItems = (id) ? (await Order.aggregate([
+      {
+        $match: {
+          $expr: {
+            $regexMatch: {
+              input: { $toString: "$_id" },
+              regex: `^${id}`,
+            },
+          },
+        },
+      },
+      { $count: "total" },
+    ])):(await Order.countDocuments({}));
+
+    const items = (Number.isInteger(totalItems) && totalItems) || (totalItems[0]?.total || 0);
+
     if( req.query._sort  ){
       orders.sort((order1,order2)=>{
         let isDescending = req.query._sort.startsWith("-");
@@ -251,9 +325,7 @@ const allOrders = async (req, res) => {
         }
       })
     } 
-    
-        console.log(page," ",limitOrders ,orders);
-    const items = orders.length;
+    console.log(page," ",limitOrders ,orders);
     res.status(200).json({ data: orders, items: items });
   } catch (err) {
     res.status(400).json({ msg: err.message });
