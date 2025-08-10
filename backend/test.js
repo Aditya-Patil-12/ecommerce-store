@@ -101,3 +101,10 @@
 // }
 // fun();
 
+
+
+// https://merchant.razorpay.com/policy/QKT1jyTTSDCVYR/terms
+// https://merchant.razorpay.com/policy/QKT1jyTTSDCVYR/privacy
+// https://merchant.razorpay.com/policy/QKT1jyTTSDCVYR/refund
+// https://merchant.razorpay.com/policy/QKT1jyTTSDCVYR/shipping
+// https://merchant.razorpay.com/policy/QKT1jyTTSDCVYR/contact_us

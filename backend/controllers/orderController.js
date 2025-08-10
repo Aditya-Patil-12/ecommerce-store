@@ -13,6 +13,7 @@ const { checkPermissions } = require("../utils");
 const RazorPay = require("razorpay");
 const {
   validateWebhookSignature,
+  validatePaymentVerification
 } = require("../node_modules/razorpay/dist/utils/razorpay-utils");
 
 const generateRazorPayInstance = () => {
@@ -150,18 +151,16 @@ const createOrder = async (req, res) => {
   return res.status(StatusCodes.CREATED).json(order);
 };
 
-// webhook password ::: _92_hXKG9S8N2zt
 const verifyPayment = async (req, res) => {
   const { order_id, payment_id, signature } = req.body;
-
   const secret = process.env.PAYMENT_KEY_SECRET;
-
-  if (
-    validateWebhookSignature(order_id + "|" + payment_id, signature, secret)
-  ) {
-    // payment Successfull
+  if( !order_id || !payment_id || !signature ){
+    throw new ApiError("Please Provide All Details");
+  }
+  if (validatePaymentVerification({ order_id, payment_id },signature,secret)) {
     const order = await Order.findOne({ paymentIntentId: order_id });
     order.paymentState = "captured";
+
     await order.save();
     // 2) order succesfull delete user cart ...
     clearCompleteCartHelper(req, res);

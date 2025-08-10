@@ -606,19 +606,19 @@ export default function CheckOutPage() {
               <div className="border-t border-gray-200 px-4 py-4 sm:px-6">
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Subtotal</p>
-                  <p>{Math.round(subTotal * 100) / 100}{" "}$</p>
+                  <p>{Math.round(subTotal * 100) / 100} ₹</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Total Tax </p>
-                  <p>{Math.round(totalTaxAmount * 100) / 100}{" "}$</p>
+                  <p>{Math.round(totalTaxAmount * 100) / 100} ₹</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Total Shipping </p>
-                  <p>{Math.round(totalShippingAmount * 100) / 100}{" "}$</p>
+                  <p>{Math.round(totalShippingAmount * 100) / 100} ₹</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-900">
                   <p>Total</p>
-                  <p>{Math.round(total * 100) / 100}{" "}$</p>
+                  <p>{Math.round(total * 100) / 100} ₹</p>
                 </div>
 
                 <p className="mt-0.5 text-sm text-gray-500">

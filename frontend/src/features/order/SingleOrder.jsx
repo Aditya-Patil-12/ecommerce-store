@@ -117,14 +117,14 @@ const SingleOrder = ({ order }) => {
                             </div>
                             <div className="grid grid-cols-2 gap-x-4 place-items-center border-1">
                               <h2>Price</h2>
-                              <p>{price}$</p>
+                              <p>{price}₹</p>
                             </div>
                           </div>
 
                           <div className="orderProductDetailsBody flex  justify-between items-center border-1 mt-5">
                             <div className="grid grid-cols-2 gap-x-2 place-items-center border-1">
                               <h2>Quantity</h2>
-                              <p>{quantity}$</p>
+                              <p>{quantity}</p>
                             </div>
                             <div className="grid grid-cols-2 gap-x-2 place-items-center border-1">
                               <h2>Discount</h2>

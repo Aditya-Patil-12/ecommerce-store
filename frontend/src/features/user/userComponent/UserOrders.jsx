@@ -84,7 +84,7 @@ export default function UserOrders() {
                                         <div className="flex justify-between text-base font-medium text-gray-900 ">
                                           <h3>{product.product.title}</h3>
                                           <p className="ml-4">
-                                            $ {product.product.price}
+                                            {product.product.price} ₹
                                           </p>
                                         </div>
                                         <div className="flex flex-row gap-2">
@@ -121,15 +121,13 @@ export default function UserOrders() {
                                 <div className="flex justify-between  text-base font-medium text-gray-900">
                                   <p>Subtotal</p>
                                   <p className="mx-2">
-                                    ${" "}
-                                    {Math.round(+order.subTotal * 100) / 100}
+                                    {Math.round(+order.subTotal * 100) / 100} ₹
                                   </p>
                                 </div>
                                 <div className="flex justify-between  text-base font-medium text-gray-900">
                                   <p>Total</p>
                                   <p className="mx-2">
-                                    ${" "}
-                                    {Math.round(+order.total * 100) / 100}
+                                    {Math.round(+order.total * 100) / 100} ₹
                                   </p>
                                 </div>
                                 <div className="flex justify-between  text-base font-medium text-gray-900">

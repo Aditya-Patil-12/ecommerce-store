@@ -147,25 +147,25 @@ const CompleteSingleOrder = ({  }) => {
                   <div className="mt-2 border-b-1 flex flex-row justify-between">
                     <p className="inline ">Subtotal</p>
                     <p className="font-normal inline">
-                      ${calAmount(order.subTotal)}
+                      {calAmount(order.subTotal)} {" "} ₹
                     </p>
                   </div>
                   <div className="mt-2 border-b-1 flex flex-row justify-between">
                     <p className="inline-block ">Shipping</p>
                     <p className="font-normal inline-block ">
-                      ${calAmount(order.totalShippingAmount)}
+                      {calAmount(order.totalShippingAmount)} {" "} ₹
                     </p>
                   </div>
                   <div className="mt-2 border-b-1 flex flex-row justify-between">
                     <p className="inline-block ">Tax</p>
                     <p className="font-normal inline-block ">
-                      ${calAmount(order.totalTaxAmount)}
+                      {calAmount(order.totalTaxAmount)} {" "} ₹
                     </p>
                   </div>
                   <div className="mt-2 flex flex-row justify-between">
                     <p className="font-bold inline-block ">Order Total</p>
                     <p className="font-semibold inline-block ">
-                      ${calAmount(order.total)}
+                      {calAmount(order.total)} {" "} ₹
                     </p>
                   </div>
                 </div>

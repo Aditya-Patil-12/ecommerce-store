@@ -35,7 +35,7 @@ const OrderProduct = ({order}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 place-items-center border-1">
                       <h2>Price</h2>
-                      <p>{price}$</p>
+                      <p>{price}₹</p>
                     </div>
                   </div>
 

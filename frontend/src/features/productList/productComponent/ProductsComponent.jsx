@@ -42,7 +42,7 @@ const ProductsComponent = ({products}) => {
                       </p>
                     </div>
                     <p className="text-sm font-medium text-gray-900 line-through">
-                      ${product.price}
+                      {product.price}{" "}₹
                     </p>
                   </div>
                   <div className="w-full flex justify-between">
@@ -50,7 +50,7 @@ const ProductsComponent = ({products}) => {
                       Flat {product.discountPercentage} %
                     </p>
                     <p className="text-sm font-medium text-gray-900">
-                      ${calculateDiscountedAmount(product.price,product.discountPercentage)}
+                      {calculateDiscountedAmount(product.price,product.discountPercentage)}{" "}₹
                     </p>
                   </div>
                 </div>
