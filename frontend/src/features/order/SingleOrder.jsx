@@ -10,7 +10,7 @@ const calAmount = (price) => {
   return Math.round(price * 100) / 100;
 };
 
-const SingleOrder = ({ order }) => {
+const SingleOrder = ({ order,orderType }) => {
   const dispatch = useDispatch();
     const [isInvoice,setIsInvoice] = useState(false);
     console.log("This is the order::: ",order);
@@ -24,7 +24,7 @@ const SingleOrder = ({ order }) => {
             <div className="orderBanner grid grid-cols-4 mb-12 px-4 border-b-1">
               <div
                 className="col-span-3 orderDetails grid grid-cols-2 gap-x-30 lg:grid-cols-3 
-                            g:gap-x-4 border-3"
+                            g:gap-x-4"
               >
                 <div className="flex flex-col ">
                   Order Id
@@ -35,7 +35,7 @@ const SingleOrder = ({ order }) => {
                               lg:flex flex-col "
                 >
                   Date Placed
-                  <h1>27 July 2023</h1>
+                  <h1>{new Date(order.updatedAt).toLocaleDateString()}</h1>
                 </div>
                 <div className="flex flex-col ">
                   Amount
@@ -43,7 +43,7 @@ const SingleOrder = ({ order }) => {
                 </div>
               </div>
               <div
-                className="col-span-1 justify-self-end mr-2 relative border-1
+                className="col-span-1 justify-self-end mr-2 relative 
                 h-7"
                 onMouseOver={() => {
                   console.log("Hey");
@@ -56,23 +56,23 @@ const SingleOrder = ({ order }) => {
               >
                 <div
                   className={
-                    "border-1 w-30 right-full " +
+                    "w-30 right-full border-1 " +
                     `${isInvoice ? "absolute" : "hidden"}`
                   }
                 >
-                  <div className="w-full mt-1 hover:bg-gray-50 
-                  cursor-pointer grid place-items-center">
-                        <Link
-                        to={"/singleOrder/" + order._id}
-                        className="block"
-                        onClick={
-                           () =>{
-                            dispatch(resetCurrentOrder(order));
-                          }
-                        }
-                        >
-                        Track Order
-                        </Link>
+                  <div
+                    className="w-full mt-1 hover:bg-gray-50 
+                  cursor-pointer grid place-items-center"
+                  >
+                    <Link
+                      to={"/singleOrder/" + order._id}
+                      className="block"
+                      onClick={() => {
+                        dispatch(resetCurrentOrder(order));
+                      }}
+                    >
+                      {orderType == "delivered" ? "View Order" : "Track Order"}
+                    </Link>
                   </div>
                   <button
                     type="button"
@@ -88,70 +88,85 @@ const SingleOrder = ({ order }) => {
               </div>
             </div>
             <div className="orderItemDetails">
-              {order.orderItems.map((orderItem) => {
-                const { thumbnail, title, price, discountPercentage } =
-                  orderItem.product;
-                const { quantity } = orderItem;
-                console.log(orderItem);
+              {order?.orderItems &&
+                order.orderItems.map((orderItem) => {
+                  const { thumbnail, title, price, discountPercentage, id } =
+                    orderItem.product;
+                  const { quantity } = orderItem;
+                  console.log(orderItem);
 
-                return (
-                  <div
-                    className="rounded-md px-4
-                                border"
-                  >
-                    <div className="itemInfoHeader w-full">
-                      <div className="infoContainer w-full md:h-[180px] md:grid grid-cols-4 items-center gap-4 border">
-                        <div className="productImage md:h-[180px]">
-                          <div className="temporary h-full border-1">
-                            <img
-                              src={`${thumbnail}`}
-                              alt=""
-                              className="bg-white w-full h-full object-contain"
-                            />
-                          </div>
-                        </div>
-                        <div className="orderProductDetails md:col-span-3 md:col-start-2">
-                          <div className="orderProductDetailsHead flex justify-between items-center border-1">
-                            <div className="border-1">
-                              <h1>{title}</h1>
-                            </div>
-                            <div className="grid grid-cols-2 gap-x-4 place-items-center border-1">
-                              <h2>Price</h2>
-                              <p>{price}₹</p>
+                  return (
+                    <div className="rounded-md px-4">
+                      <div className="itemInfoHeader w-full">
+                        <div className="infoContainer w-full md:h-[180px] md:grid grid-cols-4 items-center gap-4 border-1 rounded-md px-2">
+                          <div className="productImage h-[150px] border-1">
+                            <div className="temporary h-full">
+                              <img
+                                src={`${thumbnail}`}
+                                alt=""
+                                className="bg-white w-full h-full object-contain"
+                              />
                             </div>
                           </div>
-
-                          <div className="orderProductDetailsBody flex  justify-between items-center border-1 mt-5">
-                            <div className="grid grid-cols-2 gap-x-2 place-items-center border-1">
-                              <h2>Quantity</h2>
-                              <p>{quantity}</p>
+                          <div className="orderProductDetails md:col-span-3 md:col-start-2">
+                            <div className="orderProductDetailsHead flex justify-between items-center ">
+                              <div className="">
+                                <h1>{title}</h1>
+                              </div>
+                              <div className="grid grid-cols-2 gap-x-4 place-items-center ">
+                                <h2>Price</h2>
+                                <p>{price}₹</p>
+                              </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-x-2 place-items-center border-1">
-                              <h2>Discount</h2>
-                              <p>{discountPercentage}%</p>
+
+                            <div className="orderProductDetailsBody flex  justify-between items-center  mt-5">
+                              <div className="grid grid-cols-2 gap-x-2 place-items-center">
+                                <h2>Quantity</h2>
+                                <p>{quantity}</p>
+                              </div>
+                              <div className="grid grid-cols-2 gap-x-2 place-items-center ">
+                                <h2>Discount</h2>
+                                <p>{discountPercentage}%</p>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div
-                      className="orderFooter 
+                      <div
+                        className="orderFooter 
                                   md:h-[30px] flex flex-row-reverse items-center py-2 mt-2"
-                    >
-                      <div>
-                        <Link
-                          to={"/product-detail/" + `${orderItem.product.id}`}
-                        >
-                          {" "}
-                          View Product
-                        </Link>
-                        <div className="inline-block mx-1 border h-4"></div>
-                        <Link to="#">Buy Again</Link>
+                      >
+                        <div>
+                          <Link
+                            to={"/product-detail/" + `${orderItem.product.id}`}
+                          >
+                            {" "}
+                            View Product
+                          </Link>
+                          {orderType == "delivered" &&
+                          <div className="inline-block border-1 h-4 ml-2"></div>
+                          }
+                          {orderType == "cancelled" && (
+                            <div className="inline">
+                              <div className="inline-block mx-1  h-4"></div>
+                              <Link to="#">Buy Again</Link>
+                            </div>
+                          )}
+                          {orderType == "delivered" && (
+                            <div className="inline">
+                              <div className="inline-block mx-1  h-4"></div>
+                              <Link
+                                to={`/review?order=${order._id}&product=${id}&thumbnail=${thumbnail}`}
+                              >
+                                Add Review
+                              </Link>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </div>
         </div>

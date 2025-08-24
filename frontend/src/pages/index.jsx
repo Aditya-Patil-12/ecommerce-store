@@ -3,6 +3,8 @@ import CheckOutPage from "./CheckoutPage";
 import SharedLayoutPage from "./SharedLayoutPage";
 import LoginPage from "./LoginPage";
 import OrderSuccessPage from "./OrderSuccessPage";
+import ReviewPage from "./ReviewPage";
+import ReviewEditPage from "./ReviewEditPage";
 import PageNotFound from "./PageNotFound";
 import ProductDetailPage from "./ProductDetailPage";
 import ProductsPage from "./ProductsPage";
@@ -20,33 +22,36 @@ import AdminProductPage from "./adminPages/AdminProductPage";
 import AdminProductFormPage from './adminPages/AdminProductFormPage'
 export {
   // Auth Pages ==========>
-    LoginPage,
-    SignUpPage,
-    LogoutPage,
-    ForgotPasswordPage,
+  LoginPage,
+  SignUpPage,
+  LogoutPage,
+  ForgotPasswordPage,
   // =====================>
 
   // Cart Pages ==========>
-    CartPage,
+  CartPage,
   // =====================>
 
   // Checkout Pages ======>
-    CheckOutPage,
+  CheckOutPage,
   // =====================>
   // Order Page===========>
-    OrderSuccessPage,
-    UserOrdersPage,
-    OrderTrackingPage,
+  OrderSuccessPage,
+  UserOrdersPage,
+  OrderTrackingPage,
   // ===================?
   // Product Pages =======>
-    ProductDetailPage,
-    ProductsPage,
+  ProductDetailPage,
+  ProductsPage,
   // =====================>
 
-  // Profile Page =======> 
-    UserProfilePage,
-  // ====================> 
-  
+  // Profile Page =======>
+  UserProfilePage,
+  // ====================>
+  // Reviews Page 
+  ReviewPage,
+  ReviewEditPage,
+  //
   // Common Pages ==========>
   SharedLayoutPage,
   HomePage,

@@ -144,6 +144,7 @@ const createOrder = async (req, res) => {
     clientSecret: process.env.PAYMENT_KEY_ID,
     orderItems,
     shippingAddress,
+    status:"Pending",
   });
 
   console.log("Created Order Object ::: ", order);
@@ -160,6 +161,7 @@ const verifyPayment = async (req, res) => {
   if (validatePaymentVerification({ order_id, payment_id },signature,secret)) {
     const order = await Order.findOne({ paymentIntentId: order_id });
     order.paymentState = "captured";
+    order.status = "Processing";
 
     await order.save();
     // 2) order succesfull delete user cart ...

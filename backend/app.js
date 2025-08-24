@@ -7,7 +7,7 @@ const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const fileUpload =require('express-fileupload');
+// const fileUpload =require('express-fileupload');
 const rateLimiter = require('express-rate-limit'); 
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean')
@@ -55,8 +55,8 @@ const { loginController } = require("./controllers/authController");
 
 app.use(
   cors({
-    origin: "https://ecommerce-store-full.netlify.app",
-    // origin: "http://localhost:5173",
+    // origin: "https://ecommerce-store-full.netlify.app",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -66,7 +66,7 @@ app.use(express.json()); /// to parse json type body
 // if your signed flag is true please provide JWT_SECRET to encrypt
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.static('./public'))
-app.use(fileUpload());
+// app.use(fileUpload());
 
 
 

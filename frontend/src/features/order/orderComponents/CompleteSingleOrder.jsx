@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux';
 const calAmount = (price) => {
   return Math.round(price * 100) / 100;
 };
-const orderStatuses = ["Payment", "Pending","Shipped","Delivered"];
+const orderStatuses = ["Pending", "Processing","Shipped","Delivered"];
 const ProgressBar = ({status}) => {
     let limit =0;
     const [percentage, setPercentage] = useState(0);
     useEffect(()=> {
         orderStatuses.forEach((orderState,index)=>{
-            if( orderState == status ){
+            if( orderState.toLowerCase() == status ){
                 limit = Math.min(100,25*(index+1)+5);
             }
         })
@@ -49,12 +49,12 @@ const ProgressBar = ({status}) => {
       <div className="w-full">
         <div className="pl-[25%] inline-block">
           {/* <div className="absolute right-full"> */}
-          <h1>Payment</h1>
+          <h1>Payment </h1>
           {/* </div> */}
         </div>
         <div className="pl-[19%] inline-block">
           {/* <div className="absolute right-full"> */}
-          <h1>Pending</h1>
+          <h1>Processing</h1>
           {/* </div> */}
         </div>
         <div className="pl-[18%] inline-block">
@@ -75,7 +75,6 @@ const CompleteSingleOrder = ({  }) => {
   // console.log(order);
   const order = useSelector((state) => state.order.currentOrder);
   const orderId = "67189267dsfa7863214";
-  const orderPlacedDate = "27 Jul 2025";
   console.log("The current Order :::::",order);
   
   return (
@@ -88,7 +87,7 @@ const CompleteSingleOrder = ({  }) => {
                 <div className="mt-2 flex flex-row items-center gap-x-5">
                   <div className="">
                     <h1 className="text-center">#Order ID </h1>
-                    <p className="text-center">{orderId}</p>
+                    <p className="text-center">{order._id}</p>
                   </div>
                   <div
                     className="invoice border-1 rounded-md p-1 

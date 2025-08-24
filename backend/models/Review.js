@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 // Mongoose officially recommends using new when creating schemas.
-const ReviewSchema =  mongoose.Schema(
+const ReviewSchema = mongoose.Schema(
   {
     rating: {
       type: Number,
@@ -16,6 +16,15 @@ const ReviewSchema =  mongoose.Schema(
     comment: {
       type: String,
       required: true,
+    },
+    assets: {
+      type: [
+        {
+          url: { type: String, required: true },
+          type: { type: String, required: true },
+        },
+      ],
+      default: [],
     },
     user: {
       type: mongoose.Types.ObjectId,

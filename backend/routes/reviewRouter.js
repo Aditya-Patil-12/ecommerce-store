@@ -1,4 +1,5 @@
 const express = require("express");
+const upload = require('../middleware/multer');
 const router = express.Router();
 const {
   createReview,
@@ -7,9 +8,10 @@ const {
   allReviews,
   getSingleReview,
   uploadImage,
+  getUserReviews,
 } = require("../controllers/reviewController");
 const { authenticateUser } = require("../middleware/authentication");
-router.route("/").post([authenticateUser], createReview);
+router.route("/").post([authenticateUser], upload.array("images",12),createReview).get([authenticateUser],getUserReviews);
 // id -> review id .....
 router
   .route("/uploadImage/:id")

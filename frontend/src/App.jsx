@@ -14,6 +14,7 @@ import {
   UserProfilePage,
   OrderTrackingPage,
   PageNotFound,
+  ReviewPage,
   OrderSuccessPage,
   SharedLayoutPage,
   HomePage,
@@ -23,7 +24,8 @@ import {
   AdminProductDetailPage,
   AdminOrdersPage,
   AdminProductPage,
-  AdminProductFormPage
+  AdminProductFormPage,
+  ReviewEditPage,
 } from "./pages";
 import Demo from "./pages/Demo";
 import Protected from "./features/auth/authComponents/Protected";
@@ -145,7 +147,7 @@ function App() {
               path="/order-success/:id"
               element={
                 // <Protected>
-                  <OrderSuccessPage />
+                <OrderSuccessPage />
                 // {/* </Protected> */}
               }
             />
@@ -173,6 +175,22 @@ function App() {
               element={
                 <Protected>
                   <OrderTrackingPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/review"
+              element={
+                // <Protected>
+                  <ReviewPage />
+                // </Protected>
+              }
+            />
+            <Route
+              path="/review/edit/:id"
+              element={
+                <Protected>
+                  <ReviewEditPage />
                 </Protected>
               }
             />

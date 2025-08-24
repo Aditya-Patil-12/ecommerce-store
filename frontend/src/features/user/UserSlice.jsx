@@ -4,6 +4,7 @@ const initialState = {
   userOrders:[],
   userOrdersCount:0,
   userInfo:null, 
+  seeProfileInfo:1,
   // this will have more informatin to be used in case of detailed user info,
   // auth will only be used for loggedInUser id 
   status:"idle"
@@ -62,6 +63,11 @@ export const userSlice = createSlice({
       state.userInfo = null;
       state.userOrders= null;
       state.status = "idle";
+    },
+    setSeeProfileInfo : (state,action)=>{
+      console.log(action.payload);
+      
+      state.seeProfileInfo = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -132,5 +138,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { clearUserInfo } = userSlice.actions;
+export const { clearUserInfo, setSeeProfileInfo } = userSlice.actions;
 export default userSlice.reducer;

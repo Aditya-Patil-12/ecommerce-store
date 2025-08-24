@@ -472,7 +472,7 @@ export default function CheckOutPage() {
                         Payment Methods
                       </legend>
                       <div className="mt-6 space-y-6">
-                        <div className="flex items-center gap-x-3">
+                        {/* <div className="flex items-center gap-x-3">
                           <input
                             id="cash"
                             type="radio"
@@ -487,7 +487,7 @@ export default function CheckOutPage() {
                           >
                             Cash
                           </label>
-                        </div>
+                        </div> */}
                         <div className="flex items-center gap-x-3">
                           <input
                             id="card"
@@ -501,7 +501,7 @@ export default function CheckOutPage() {
                             htmlFor="card"
                             className="block text-sm/6 font-medium text-gray-900"
                           >
-                            Card
+                            Cashless
                           </label>
                         </div>
                       </div>
@@ -515,7 +515,7 @@ export default function CheckOutPage() {
           {/* ================= End of Form ================================ */}
           {/* Shopping Cart In CheckOut Page */}
           <div className="mt-2 lg:col-span-2">
-            <div className="flex  flex-col overflow-y-scroll bg-white shadow-xl">
+            <div className="flex  flex-col overflow-y-auto bg-white shadow-xl">
               <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 ">
                 <div className="flex items-start justify-between">
                   <h1 className="text-2xl font-medium text-gray-900">

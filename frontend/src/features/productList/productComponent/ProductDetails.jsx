@@ -4,10 +4,13 @@ import { Radio, RadioGroup } from "@headlessui/react";
 import { Navigate, useParams } from "react-router";
 import { fetchProductDetailAsync } from "../productListSlice";
 import { useDispatch, useSelector } from "react-redux";
-
+import ViewInfo from "./ViewInfo";
 import { addToCartAsync } from "../../cart/CartSlice";
 import calculateProductCosting from "../../../utils/calculateProductCosting";
 import { toast } from "react-toastify";
+import calculateDiscountedAmount from "../../../utils/calculateDiscountedAmount";
+import ProductReviews from "./ProductReviews";
+import { getProductReviewAsync } from "../../review/ReviewSlice";
 const colors = [
   { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
   { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
@@ -47,6 +50,7 @@ export default function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       await dispatch(fetchProductDetailAsync(id));
+      await dispatch(getProductReviewAsync(id));
       // console.log("going inside over");
     };
     fetchProduct();
@@ -81,7 +85,7 @@ export default function ProductDetails() {
   return (
     <>
       <div className="bg-white">
-        <div className="pt-6">
+        <div className="pt-6 px-4">
           <nav aria-label="Breadcrumb">
             <ol
               role="list"
@@ -126,18 +130,86 @@ export default function ProductDetails() {
 
           {/* Product info */}
           <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">
-            <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
+            <div className="lg:col-span-2 lg:row-span-3 lg:border-r lg:border-gray-200 lg:pr-8">
               <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                 {product.title}
+                <div className="flex justify-end space-y-6">
+                  <p className="text-base text-gray-900">
+                    - Product By {product.brand}
+                  </p>
+                </div>
               </h1>
+              {/* Description and details */}
+              <div className="py-10 lg:col-span-2 lg:col-start-1 lg:pt-6 lg:pr-8 lg:pb-16 ">
+                <div>
+                  <h3 className="sr-only">Description</h3>
+
+                  <div className="space-y-6">
+                    <p className="text-base text-gray-900">
+                      {product.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="costing">
+                  {/* Green */}
+                  <div className="stock flex justify-between items-center w-full min-h-[50px] mt-2">
+                    <h1 className={product.stock ? "text-green" : "text-red"}>
+                      {"In Stock"}
+                    </h1>
+                    <h1>{product.stock} Products</h1>
+                  </div>
+                  <div className="stock flex justify-between items-center w-full min-h-[50px] mt-2">
+                    <h1>{"Price"}</h1>
+                    <div className="actualCosting">
+                      <div className="min-w-25 flex justify-between">
+                        <p className="inline" style={{ color: "green" }}>
+                          {"-" + product.discountPercentage}%
+                        </p>{" "}
+                        <h1 className="inline">
+                          {calculateDiscountedAmount(
+                            product.price,
+                            product.discountPercentage
+                          )}{" "}
+                          ₹
+                        </h1>
+                      </div>
+                      <div className="min-w-25">
+                        <p className="inline">MRP</p>
+                        {" : "}
+                        <h1 className="line-through inline">
+                          {product.price} ₹
+                        </h1>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shipping flex justify-between items-center w-full min-h-[50px] mt-2">
+                    <h1>{"Shipping Charges"}</h1>
+                    <h1>{product.shippingAmount} ₹</h1>
+                  </div>
+                </div>
+                {/* <div className="mt-10"> */}
+                {/* <h3 className="text-sm font-medium text-gray-900">Highlights</h3> */}
+
+                {/* <div className="mt-4">
+                    <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
+                      {product.highlights.map((highlight) => (
+                        <li key={highlight} className="text-gray-400">
+                          <span className="text-gray-600">{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div> */}
+                {/* </div> */}
+              </div>
             </div>
 
             {/* Options */}
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl tracking-tight text-gray-900">
+              {/* <p className="text-3xl tracking-tight text-gray-900">
                 {product.price} ₹
-              </p>
+              </p> */}
 
               {/* Reviews */}
               <div className="mt-6">
@@ -149,7 +221,7 @@ export default function ProductDetails() {
                         key={rating}
                         aria-hidden="true"
                         className={classNames(
-                          reviews.average > rating
+                          product.averageRating > rating
                             ? "text-gray-900"
                             : "text-gray-200",
                           "size-5 shrink-0"
@@ -157,12 +229,14 @@ export default function ProductDetails() {
                       />
                     ))}
                   </div>
-                  <p className="sr-only">{reviews.average} out of 5 stars</p>
+                  <p className="sr-only">
+                    {product.averageRating} out of 5 stars
+                  </p>
                   <a
-                    href={reviews.href}
+                    href={"#reviewSection"}
                     className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
                   >
-                    {reviews.totalCount} reviews
+                    {product.numOfReviews} reviews
                   </a>
                 </div>
               </div>
@@ -308,43 +382,35 @@ export default function ProductDetails() {
                 </button>
               </form>
             </div>
-
-            {/* Description and details */}
-            <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16 ">
-              <div>
-                <h3 className="sr-only">Description</h3>
-
-                <div className="space-y-6">
-                  <p className="text-base text-gray-900">
-                    {product.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* <div className="mt-10"> */}
-              {/* <h3 className="text-sm font-medium text-gray-900">Highlights</h3> */}
-
-              {/* <div className="mt-4">
-                <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {product.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div> */}
-              {/* </div> */}
-
-              <div className="mt-10">
-                <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-                <div className="mt-4 space-y-6">
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                </div>
-              </div>
-            </div>
-            {/*==============================  Description and details */}
           </div>
+
+          {/* Extra Info =================== */}
+          {/* Warrant Information */}
+          {/* <ViewInfo
+            heading={"Product Description"}
+            text={product.description}
+          />   */}
+          <ViewInfo
+            heading={"Product Return Policy"}
+            text={product.returnPolicy}
+          />
+          <ViewInfo
+            heading={"Product Warranty Policy"}
+            text={product.warrantyInformation}
+          />
+          {/* Review Section  ============ */}
+          
+          <div className="mt-10" id="reviewSection">
+            <h2 className="text-xl font-medium tracking-tight text-gray-900 sm:text-3xl">
+              Reviews
+            </h2>
+
+            {/* <div className="mt-4 space-y-6">
+              <p className="text-sm text-gray-600">{product.description}</p>
+            </div> */}
+            <ProductReviews />
+          </div>
+          {/* ============================== */}
         </div>
       </div>
     </>
@@ -405,3 +471,15 @@ export default function ProductDetails() {
 //   details:
 //     'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
 // };
+
+
+
+          {/* <div className="mt-10">
+            <h2 className="text-sm font-medium text-gray-900">
+              Product Details
+            </h2>
+
+            <div className="mt-4 space-y-6">
+              <p className="text-sm text-gray-600">{product.description}</p>
+            </div>
+          </div> */}

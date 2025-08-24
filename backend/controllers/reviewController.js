@@ -4,14 +4,15 @@ const CustomError = require("../errors");
 const path = require('path');
 const Product = require("../models/Product");
 const { checkPermissions } = require("../utils");
-
+const {uploadOnCloudinary,deleteFile} = require('../utils/cloudinary')
 // user can give a review 
 // one review per product
 
 const createReview = async (req, res) => {
   const { userId } = req.user;
   const {product} = req.body;
-
+  console.log("Check this body",req.body,' ',req.files);
+  
   if( !product ){
     throw new CustomError.NotFoundError('Please Select for review');
   }
@@ -20,19 +21,39 @@ const createReview = async (req, res) => {
     throw new CustomError.BadRequestError("Product Selected for Review Does Not exists");
   }
   // check for already existing review for the product by the customer .....
-  const gaveReviewAlready = await Review.find({user:userId,product});
-  console.log(gaveReviewAlready);
+  // const gaveReviewAlready = await Review.find({user:userId,product});
+  // console.log(gaveReviewAlready);
   
-  if( gaveReviewAlready.length === 1 ){
-    throw new CustomError.BadRequestError(
-      "Already Product is Reviewed"
-    );
-  }
-  const reviewInfo = { ...req.body, user: userId };
+// if( gaveReviewAlready.length === 1 ){
+  //   throw new CustomError.BadRequestError(
+    //     "Already Product is Reviewed"
+    //   );
+    // }
+    
+    //   {
+    //   fieldname: 'images',
+    //   originalname: 'Internship JD â\x80\x93 AIMLDS Developer.pdf',
+    //   encoding: '7bit',
+    //   mimetype: 'application/pdf',
+    //   destination: './public/uploads',
+    //   filename: 'images-Internship JD â\x80\x93 AIMLDS Developer.pdf',
+    //   path: 'public\\uploads\\images-Internship JD â\x80\x93 AIMLDS Developer.pdf',
+    //   size: 112754
+    // }
+    console.log("Converting Files");
+    
+    let assets = [];
+    for(let file of req.files){
+      const info = await uploadOnCloudinary(file.path, { use_filename: true });
+      console.log(info);
+      assets.push({ url: info.url, type: info.resource_type });
+    }
+  console.log("Assets Done \n",assets);
+  const reviewInfo = { ...req.body, user: userId,assets };
   const review = await Review.create(reviewInfo);
   return res.status(StatusCodes.CREATED).json(review);
 };
-// publicly accessible for all
+    // publicly accessible for all
 const getSingleReview = async (req, res) => {
   const { id } = req.params;
   const review = await Review.findOne({ _id: id });
@@ -77,7 +98,7 @@ const updateReview = async (req, res) => {
         );
     }
     checkPermissions({ requestUser: req.user, resourceUserId: review.user });
-    let ratingChange = rating-review.rating;
+    // let ratingChange = rating-review.rating;
     review.title = title;
     review.rating = rating;
     review.comment = comment;
@@ -107,6 +128,7 @@ const uploadImage = async (req, res) => {
   await reviewProductImage.mv(imagePath);
   return res.status(StatusCodes.OK).json({ msg: "Upload Product Image" });
 };
+
 // publicly accessible for all
 const allReviews = async (req, res) => {
     // product Id 
@@ -127,6 +149,21 @@ const allReviews = async (req, res) => {
         res.status(400).json({ msg: err.message });
     }
 };
+
+const getUserReviews = async (req,res)=>{
+  const userId = req.user.userId;
+  const reviews = await Review.find({user:userId})
+  .populate({
+    path: "product",
+    select: "title brand price _id thumbnail",
+  })
+  .populate({
+    path: "user",
+    select: "name",
+  });
+  return res.status(200).json(reviews);
+}
+
 module.exports = {
   createReview,
   allReviews,
@@ -134,4 +171,5 @@ module.exports = {
   deleteReview,
   updateReview,
   uploadImage,
+  getUserReviews,
 };

@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Link } from 'react-router'
 import { loggedInUserInfo } from "../user/UserAPI";
@@ -8,11 +8,10 @@ import SingleOrder from "./SingleOrder";
 import './order.css'
 export default function Orders() {
   const dispatch = useDispatch();
-
+  const [orderType,setOrderType] = useState("normal");
   // auth Variables ...
   // const {id: userId} = useSelector((state) => state.user.userInfo);
   const orders = useSelector((state) => state.order.orders);
-
   console.log("Hey Orders", orders);
   if (orders) {
     console.log(orders, "is Truthy");
@@ -21,7 +20,7 @@ export default function Orders() {
 
   return (
     <>
-      <div className="mx-auto max-w-7xl border-1">
+      <div className="mx-auto max-w-7xl">
         <div className="ordersBanner">
           <h1 className="text-3xl font-medium text-gray-900">Order history</h1>
           <p className="font-medium text-gray-900">
@@ -29,14 +28,52 @@ export default function Orders() {
             similar products.
           </p>
         </div>
-
+        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1 bg-white mt-5 min-h-[50px]">
+          <div className="flex justify-around">
+            <button
+              type="button"
+              onClick={() => setOrderType("normal")}
+              className={
+                "cursor-pointer  " +
+                (orderType == "normal" ? "border-b-5" : "")
+              }
+            >
+              Orders
+            </button>
+            <button
+              type="button"
+              onClick={() => setOrderType("delivered")}
+              className={
+                "cursor-pointer  " +
+                (orderType == "delivered" ? "border-b-5" : "")
+              }
+            >
+              Delivered Orders
+            </button>
+            <button
+              type="button"
+              onClick={() => setOrderType("Pending")}
+              className={
+                "cursor-pointer  " +
+                (orderType == "Pending" ? "border-b-5" : "")
+              }
+            >
+              Pending Orders
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-1">
-          <div className="lg:col-span-1 border-1">
+          <div className="lg:col-span-1">
             {orders &&
               orders
+                .filter((order) => {
+                  if( orderType == "normal" )
+                  return order.status.toLowerCase() != "delivered" && order.status.toLowerCase() != "pending" 
+                else return order.status.toLowerCase() == orderType.toLowerCase();
+                })
                 .slice(0)
                 .reverse()
-                .map((order) => <SingleOrder order={order} />)}
+                .map((order) => <SingleOrder order={order} orderType={orderType}/>)}
           </div>
         </div>
       </div>

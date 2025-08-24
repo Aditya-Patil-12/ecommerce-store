@@ -4,6 +4,7 @@ import authReducer from '../features/auth/AuthSlice'
 import cartReducer from '../features/cart/CartSlice'
 import orderReducer from '../features/order/OrderSlice'
 import userReducer from '../features/user/UserSlice'
+import reviewReducer from '../features/review/ReviewSlice'
 import { persistReducer ,persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'
 const rootReducer = combineReducers({
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   cart: cartReducer,
   order: orderReducer,
   user: userReducer,
+  review: reviewReducer,
 });
 const persistConfig = {
   key : "root",

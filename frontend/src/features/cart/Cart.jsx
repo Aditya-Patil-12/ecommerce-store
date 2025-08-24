@@ -118,7 +118,7 @@ export default function Cart() {
                       </p>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
-                      <div className="quantityChange w-17 border-1 max-w-[100px] grid grid-cols-3 justify-around">
+                      <div className="quantityChange w-17  max-w-[100px] grid grid-cols-3 justify-around">
                         <div className="self-center">
                           <button
                             type="button"
