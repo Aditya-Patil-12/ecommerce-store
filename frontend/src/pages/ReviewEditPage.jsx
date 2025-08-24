@@ -64,7 +64,7 @@ const ReviewEditPage = () => {
             <div className="flex items-center gap-5 ">
               <div className="bannner w-[100px] h-[100px] rounded-full ">
                 <img
-                  src={currentReview.product.thumbnail}
+                  src={currentReview?.product?.thumbnail}
                   alt=""
                   className="w-full h-full object-contain rounded-full"
                 />
